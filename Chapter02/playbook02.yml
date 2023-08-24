@@ -1,0 +1,10 @@
+---
+- hosts: ansible_hosts
+  gather_facts: true
+  become: yes
+  become_method: sudo
+
+  roles:
+    - "itnok.update_ubuntu"
+    - "geerlingguy.nginx"
+    - "russmckendrick.ansible_role_learnansible_example"

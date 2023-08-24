@@ -1,0 +1,1 @@
+paste_your_ip_here.nip.io ansible_user=vmadmin ansible_private_key_file=./example_key

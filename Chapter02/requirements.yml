@@ -1,0 +1,3 @@
+- src: "itnok.update_ubuntu"
+- src: "geerlingguy.nginx"
+- src: "russmckendrick.ansible_role_learnansible_example"

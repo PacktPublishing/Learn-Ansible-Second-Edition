@@ -1,0 +1,14 @@
+---
+
+- hosts: ansible_hosts
+  gather_facts: true
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - ansible.builtin.debug:
+        msg: "I am connecting to {{ ansible_nodename }} which is running {{ ansible_distribution }} {{ ansible_distribution_version }}"
+    - ansible.builtin.apt:
+        name: "*"
+        state: "latest"
+        update_cache: "yes"

@@ -1,0 +1,22 @@
+ansible01 ansible_host=139.162.233.174
+ansible02 ansible_host=139.162.233.227
+ansible03 ansible_host=139.144.132.49
+ansible04 ansible_host=139.144.132.71
+
+[london]
+ansible01
+ansible02
+
+[nyc]
+ansible03
+ansible04
+
+[demohosts:children]
+london
+nyc
+
+[demohosts:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_private_key_file=~/.ssh/id_rsa
+host_key_checking=False

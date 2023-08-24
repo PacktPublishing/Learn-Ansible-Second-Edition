@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  vars_files:
+    - "myvars.yml"
+  tasks:
+    - ansible.builtin.debug:
+        msg:
+         - "The username is {{ username }} and password is {{ password }}, also the API key is {{ secretapikey }}"
+         - "I am going to install {{ packages }}"
