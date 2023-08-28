@@ -5,7 +5,6 @@
   ansible.builtin.apt:
     state: "latest"
     pkg: "{{ mariadb_packages }}"
-  notify: "restart apache2"
 
 - name: "start mariadb"
   ansible.builtin.service:

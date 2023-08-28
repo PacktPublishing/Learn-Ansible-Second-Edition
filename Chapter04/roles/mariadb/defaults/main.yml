@@ -4,7 +4,6 @@
 mariadb_packages:
   - "mariadb-server"
   - "mariadb-client"
-  - "php-mysql"
   - "python3-pymysql"
 
 mariadb_root_username: "root"

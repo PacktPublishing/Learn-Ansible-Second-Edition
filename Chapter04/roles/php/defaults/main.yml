@@ -3,17 +3,17 @@
 
 php_packages:
   - "php"
-  - "libapache2-mod-php"
-  - "php-mysql"
   - "php-cli"
   - "php-curl"
   - "php-gd"
+  - "php-intl"
   - "php-mbstring"
+  - "php-mysql"
+  - "php-soap"
   - "php-xml"
   - "php-xmlrpc"
-  - "php-soap"
-  - "php-intl"
   - "php-zip"
+  - "libapache2-mod-php"
 
 php_info: true
 

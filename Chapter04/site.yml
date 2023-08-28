@@ -10,5 +10,5 @@
   roles:
     - "roles/common"
     - "roles/apache"
-    - "roles/php"
     - "roles/mariadb"
+    - "roles/php"
