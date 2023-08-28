@@ -4,8 +4,11 @@
   become: yes
   become_method: sudo
 
+  vars_files:
+    - "group_vars/common.yml"
+
   roles:
-    - roles/common
-    - roles/apache
-    - roles/php
-    - roles/mariadb
+    - "roles/common"
+    - "roles/apache"
+    - "roles/php"
+    - "roles/mariadb"
