@@ -1,2 +1,84 @@
 ---
 # tasks file for roles/mariadb
+
+- name: "install mariadb packages"
+  ansible.builtin.apt:
+    state: "latest"
+    pkg: "{{ mariadb_packages }}"
+  notify: "restart apache2"
+
+- name: "start mariadb"
+  ansible.builtin.service:
+    name: "mariadb"
+    state: "started"
+    enabled: "yes"
+
+- name: "check to see if the ~/.my.cnf file exists"
+  ansible.builtin.stat:
+    path: "~/.my.cnf"
+  register: mycnf
+
+- name: "change mysql root password if we need to"
+  ansible.builtin.mysql_user:
+    name: "{{ mariadb_root_username }}"
+    host: "{{ item }}"
+    password: "{{ mariadb_root_password }}"
+    check_implicit_admin: "yes"
+    priv: "*.*:ALL,GRANT"
+    login_user: "root"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+  with_items: "{{ mariadb_hosts }}"
+  when: mycnf.stat.exists == false
+
+- name: "set up ~/.my.cnf file"
+  ansible.builtin.template:
+    src: "my.cnf.j2"
+    dest: "~/.my.cnf"
+
+- name: "delete anonymous MySQL user"
+  ansible.builtin.mysql_user:
+    user: ""
+    host: "{{ item }}"
+    state: "absent"
+  with_items: "{{ mariadb_hosts }}"
+
+- name: "remove the MySQL test database"
+  ansible.builtin.mysql_db:
+    db: "test"
+    state: "absent"
+
+- name: "download and unarchive the sample database data"
+  ansible.builtin.unarchive:
+    src: "{{ mariadb_sample_database.source_url }}"
+    dest: "/tmp"
+    remote_src: "yes"
+  when: mariadb_sample_database.create_database == true
+
+- name: "create the sample database"
+  ansible.builtin.mysql_db:
+    db: "{{ mariadb_sample_database.db_name }}"
+    state: "present"
+  when: mariadb_sample_database.create_database == true
+
+- name: "create the user for the sample database"
+  ansible.builtin.mysql_user:
+    name: "{{ mariadb_sample_database.db_user }}"
+    password: "{{ mariadb_sample_database.db_password }}"
+    priv: "{{ mariadb_sample_database.db_name }}.*:ALL"
+    state: "present"
+  with_items: "{{ mariadb_hosts }}"
+  when: mariadb_sample_database.create_database == true
+
+- name: "check to see if we need to import the sample database dumps"
+  ansible.builtin.stat:
+    path: "/var/lib/mysql/{{ mariadb_sample_database.db_name }}/{{ mariadb_sample_database.db_name }}.frm"
+  register: db_imported
+  when: mariadb_sample_database.create_database == true
+
+- name: "import the sample database"
+  ansible.builtin.mysql_db:
+    name: "{{ mariadb_sample_database.db_name }}"
+    state: "import"
+    target: "{{ mariadb_sample_database.path }}/{{ item }}"
+  with_items: "{{ mariadb_sample_database.dump_files }}"
+  when: db_imported is defined and db_imported.stat.exists == false
