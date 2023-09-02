@@ -1,7 +1,7 @@
 ---
 - hosts: ansible_hosts
   gather_facts: true
-  become: yes
+  become: true
   become_method: sudo
 
   vars_files:
@@ -9,6 +9,6 @@
 
   roles:
     - "roles/common"
-    # - "roles/apache"
-    # - "roles/mariadb"
-    # - "roles/php"
+    - "roles/apache"
+    - "roles/mariadb"
+    - "roles/php"
