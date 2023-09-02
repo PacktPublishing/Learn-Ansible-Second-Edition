@@ -24,6 +24,7 @@ mariadb_sample_database:
   db_password: "employees"
   dump_files:
     - "employees.sql"
+    - "show_elapsed.sql"
     - "load_departments.dump"
     - "load_employees.dump"
     - "load_dept_emp.dump"
@@ -32,4 +33,3 @@ mariadb_sample_database:
     - "load_salaries1.dump"
     - "load_salaries2.dump"
     - "load_salaries3.dump"
-    - "show_elapsed.sql"
