@@ -18,12 +18,12 @@
     dest: "/etc/ntp.conf"
   notify: "restart ntp"
 
-- name: "generate an ssh keypair"
+- name: "generate a ssh keypair"
   community.crypto.openssh_keypair:
     path: "{{ item.key }}"
   with_items: "{{ users }}"
   delegate_to: "localhost"
-  become: "no"
+  become: false
 
 - name: "add group for our users"
   ansible.builtin.group:

@@ -16,4 +16,9 @@ ntp_servers:
   - "3.uk.pool.ntp.org"
 
 users:
-  - { name: "lamp", group: "lamp", state: "present", key: "/tmp/id_ssh_rsa" }
+  - {
+      name: "lamp",
+      group: "lamp",
+      state: "present",
+      key: "/tmp/id_ssh_lamp_rsa",
+    }
