@@ -16,9 +16,4 @@ ntp_servers:
   - "3.uk.pool.ntp.org"
 
 users:
-  - {
-      name: "lamp",
-      group: "lamp",
-      state: "present",
-      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}",
-    }
+  - { name: "lamp", group: "lamp", state: "present", key: "/tmp/id_ssh_rsa" }

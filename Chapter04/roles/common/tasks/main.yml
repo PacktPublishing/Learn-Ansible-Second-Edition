@@ -18,6 +18,10 @@
     dest: "/etc/ntp.conf"
   notify: "restart ntp"
 
+- name: "generate an ssh keypair"
+  community.crypto.openssh_keypair:
+    path: "{{ item.key }}"
+
 - name: "add group for our users"
   ansible.builtin.group:
     name: "{{ item.group }}"
@@ -35,5 +39,5 @@
 - name: "add keys to our users"
   ansible.builtin.authorized_key:
     user: "{{ item.name }}"
-    key: "{{ item.key }}"
+    key: "{{ item.key }}.pub"
   with_items: "{{ users }}"
