@@ -6,14 +6,14 @@
     state: "latest"
     pkg: "{{ apache_packages }}"
 
-- name: Add user to apache group
+- name: "add user to apache group"
   ansible.builtin.user:
     name: "{{ item.name }}"
     groups: "{{ apache_group }}"
-    append: yes
+    append: true
   with_items: "{{ users }}"
 
-- name: create the document root for our website
+- name: "create the document root for our website"
   ansible.builtin.file:
     dest: "{{ document_root }}"
     state: "directory"
@@ -21,26 +21,26 @@
     owner: "{{ users.0.name }}"
     group: "{{ apache_group }}"
 
-- name: set the permissions on the user folder
+- name: "set the permissions on the user folder"
   ansible.builtin.file:
     dest: "/home/{{ users.0.name }}/"
     state: "directory"
     mode: "0755"
     owner: "{{ users.0.name }}"
 
-- name: remove the apache default vhost config
+- name: "remove the apache default vhost config"
   ansible.builtin.file:
     path: "{{ vhost_path }}{{ vhost_default_file }}"
     state: "absent"
   notify: "restart apache2"
 
-- name: copy the our vhost.conf to the sites-enabled folder
+- name: "copy the our vhost.conf to the sites-enabled folder"
   ansible.builtin.template:
     src: "vhost.conf.j2"
     dest: "{{ vhost_path }}{{ vhost_our_file }}"
   notify: "restart apache2"
 
-- name: copy the test HTML page to the document root
+- name: "copy the test HTML page to the document root"
   ansible.builtin.template:
     src: "index.html.j2"
     dest: "{{ document_root }}/index.html"
