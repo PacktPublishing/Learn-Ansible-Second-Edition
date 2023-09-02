@@ -21,6 +21,9 @@
 - name: "generate an ssh keypair"
   community.crypto.openssh_keypair:
     path: "{{ item.key }}"
+  with_items: "{{ users }}"
+  delegate_to: "localhost"
+  become: "no"
 
 - name: "add group for our users"
   ansible.builtin.group:
@@ -39,5 +42,5 @@
 - name: "add keys to our users"
   ansible.builtin.authorized_key:
     user: "{{ item.name }}"
-    key: "{{ item.key }}.pub"
+    key: "{{ lookup('file', item.key + '.pub') }}"
   with_items: "{{ users }}"

@@ -9,6 +9,6 @@
 
   roles:
     - "roles/common"
-    - "roles/apache"
-    - "roles/mariadb"
-    - "roles/php"
+    # - "roles/apache"
+    # - "roles/mariadb"
+    # - "roles/php"
