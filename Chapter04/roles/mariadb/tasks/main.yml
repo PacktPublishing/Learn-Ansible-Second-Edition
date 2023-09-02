@@ -24,7 +24,7 @@
     password: "{{ mariadb_root_password }}"
     check_implicit_admin: "yes"
     priv: "*.*:ALL,GRANT"
-    login_user: "root"
+    login_user: "{{ mariadb_root_username }}"
     login_unix_socket: "/var/run/mysqld/mysqld.sock"
   with_items: "{{ mariadb_hosts }}"
   when: mycnf.stat.exists == false
@@ -33,6 +33,7 @@
   ansible.builtin.template:
     src: "my.cnf.j2"
     dest: "~/.my.cnf"
+    mode: "0600"
 
 - name: "delete anonymous MySQL user"
   ansible.builtin.mysql_user:
