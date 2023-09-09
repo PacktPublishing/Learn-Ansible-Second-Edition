@@ -1,2 +1,33 @@
 ---
 # tasks file for roles/stack-install
+
+- name: "update cache and install the system packages"
+  ansible.builtin.apt:
+    state: "latest"
+    update_cache: "yes"
+    pkg: "{{ system_packages }}"
+
+- name: "add the apt keys from a key server"
+  ansible.builtin.apt_key:
+    keyserver: "{{ item.key_server }}"
+    id: "{{ item.key }}"
+  with_items: "{{ repo_keys }}"
+
+- name: "add the apt keys from a URL"
+  ansible.builtin.apt_key:
+    url: "{{ item }}"
+    state: "present"
+  with_items: "{{ repo_keys_url }}"
+
+- name: "install the repo packages"
+  ansible.builtin.apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+    update_cache: "yes"
+  with_items: "{{ repo_packages }}"
+
+- name: "update cache and install the stack packages"
+  ansible.builtin.apt:
+    state: "latest"
+    update_cache: "yes"
+    pkg: "{{ stack_packages + extra_packages }}"

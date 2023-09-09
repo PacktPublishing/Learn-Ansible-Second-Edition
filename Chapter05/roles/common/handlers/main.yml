@@ -1,8 +1,0 @@
----
-# handlers file for roles/common
-
-- name: "restart ntp"
-  ansible.builtin.service:
-    name: "ntp"
-    state: "restarted"
-    enabled: "yes"
