@@ -1,0 +1,46 @@
+---
+# tasks file for roles/common
+
+- name: "update apt cache and upgrade packages"
+  ansible.builtin.apt:
+    name: "*"
+    state: "latest"
+    update_cache: "yes"
+
+- name: "install common packages"
+  ansible.builtin.apt:
+    state: "latest"
+    pkg: "{{ common_packages }}"
+
+- name: "copy ntp.conf template to host"
+  ansible.builtin.template:
+    src: "./ntp.conf.j2"
+    dest: "/etc/ntp.conf"
+  notify: "restart ntp"
+
+- name: "generate a ssh keypair"
+  community.crypto.openssh_keypair:
+    path: "{{ item.key }}"
+  with_items: "{{ users }}"
+  delegate_to: "localhost"
+  become: false
+
+- name: "add group for our users"
+  ansible.builtin.group:
+    name: "{{ item.group }}"
+    state: "{{ item.state }}"
+  with_items: "{{ users }}"
+
+- name: "add users to our group"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    group: "{{ item.group }}"
+    comment: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items: "{{ users }}"
+
+- name: "add keys to our users"
+  ansible.builtin.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', item.key + '.pub') }}"
+  with_items: "{{ users }}"

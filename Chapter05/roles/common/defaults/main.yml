@@ -1,0 +1,24 @@
+---
+# defaults file for roles/common
+
+common_packages:
+  - "ntp"
+  - "sntp"
+  - "ntp-doc"
+  - "vim"
+  - "git"
+  - "unzip"
+
+ntp_servers:
+  - "0.uk.pool.ntp.org"
+  - "1.uk.pool.ntp.org"
+  - "2.uk.pool.ntp.org"
+  - "3.uk.pool.ntp.org"
+
+users:
+  - {
+      name: "lamp",
+      group: "lamp",
+      state: "present",
+      key: "/tmp/id_ssh_lamp_rsa",
+    }

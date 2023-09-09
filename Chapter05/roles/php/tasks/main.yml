@@ -1,0 +1,38 @@
+---
+# tasks file for roles/php
+
+- name: "install php packages"
+  ansible.builtin.apt:
+    state: "latest"
+    pkg: "{{ php_packages }}"
+  notify: "restart apache2"
+
+- name: "copy the PHP info to the document root"
+  ansible.builtin.copy:
+    src: "info.php"
+    dest: "{{ document_root }}/info.php"
+    mode: "0755"
+    owner: "{{ users.0.name }}"
+    group: "{{ apache_group }}"
+  when: php_info == true
+
+- name: "create the document root for adminer"
+  ansible.builtin.file:
+    dest: "{{ adminer.path }}"
+    state: "directory"
+    mode: "0755"
+  when: adminer.install == true
+
+- name: "download adminer"
+  ansible.builtin.get_url:
+    url: "{{ adminer.download }}"
+    dest: "{{ adminer.path }}/index.php"
+    mode: "0755"
+  when: adminer.install == true
+
+- name: "copy the adminer.conf to sites-enabled folder"
+  ansible.builtin.template:
+    src: "adminer.conf.j2"
+    dest: "{{ vhost_path }}adminer.conf"
+  when: adminer.install == true
+  notify: "restart apache2"

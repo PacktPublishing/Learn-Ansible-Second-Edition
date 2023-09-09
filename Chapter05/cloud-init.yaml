@@ -1,0 +1,6 @@
+users:
+  - default
+  - name: vmadmin
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1ckyTsPb9YYld1hFT9bVCpRTbLeMRVl52rBm3E3k3BS8DhxA3oCLBuP4PBTlOUegD1CptnY+aU6odKNEiRxCudocrI9jP46B4E5GFykB+y5wNGdSWtpMoW5UNnoUWf/HUOl9xtKtOFimjEyQyN0BM3qViyo9gJ/NnjDdQjWIk5M8DV2DknlSl683pZcFTF4opwwvjy8yxERxcHK1sGBqPjAf3NAYHIS6d5Y9hyybRImnOpzjQfbziyDSWX+siTaXKR8hN7yVoYcH5Xwy8SIxZUf7RWt8Bnl6MT/ufggyIvgMSMzU2f7jCFnXmwxP32wb+1LN01MNiMKOMidV5UpJcYzn2yf0D6ii+/oJdDMI662m+1NuDLMn0FQHcG1rqiYcOSPMnDL7XQJ6heMj8XyGWcrbQEk/Xcg46rvBAz4VWscsgWGBYzvNT5mKR/sghSp+vAA2EazLgH+lge5toEDYglKfTm+v3Y0PI0raVzDWUYOcN4cT791/ROGrQThPEBKE= donotuse@example.com
