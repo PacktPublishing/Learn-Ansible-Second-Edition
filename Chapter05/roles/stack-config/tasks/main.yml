@@ -6,12 +6,6 @@
     name: "{{ wordpress_system.group }}"
     state: "{{ wordpress_system.state }}"
 
-- name: "create the /var/www/ directory"
-  ansible.builtin.file:
-    dest: "/var/www/"
-    state: "directory"
-    mode: "0755"
-
 - name: "add the wordpress user"
   ansible.builtin.user:
     name: "{{ wordpress_system.user }}"

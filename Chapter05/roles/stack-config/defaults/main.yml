@@ -1,10 +1,6 @@
 ---
 # defaults file for roles/stack-config
 
-php_fpm_path: "/etc/php/8.1/fpm/pool.d/www.conf"
-php_ini_path: "/etc/php/8.1/fpm/php.ini"
-php_service_name: "php8.1-fpm"
-
 wordpress_system:
   user: "wordpress"
   group: "php-fpm"
@@ -23,6 +19,10 @@ php:
         regexp: "^upload_max_filesize = 2M",
         replace: "upload_max_filesize = 20M",
       }
+
+php_fpm_path: "/etc/php/8.1/fpm/pool.d/www.conf"
+php_ini_path: "/etc/php/8.1/fpm/php.ini"
+php_service_name: "php8.1-fpm"
 
 mariadb:
   bind: "127.0.0.1"
