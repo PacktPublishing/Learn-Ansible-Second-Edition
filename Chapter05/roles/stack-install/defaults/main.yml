@@ -1,15 +1,12 @@
 ---
 # defaults file for roles/stack-install
 
+repo_keys_url:
+  - "http://nginx.org/keys/nginx_signing.key"
+
 repo_packages:
   - "deb http://nginx.org/packages/mainline/ubuntu/ {{ ansible_distribution_release }} nginx"
   - "deb-src http://nginx.org/packages/mainline/ubuntu/ {{ ansible_distribution_release }} nginx"
-
-repo_keys:
-  - { key_server: "keyserver.ubuntu.com", key: "0xF1656F24C74CD1D8" }
-
-repo_keys_url:
-  - "http://nginx.org/keys/nginx_signing.key"
 
 system_packages:
   - "software-properties-common"
