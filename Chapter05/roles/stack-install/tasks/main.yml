@@ -24,4 +24,4 @@
   ansible.builtin.apt:
     state: "latest"
     update_cache: "yes"
-    pkg: "{{ system_packages + stack_packages + extra_packages }}"
+    pkg: "{{ system_packages + extra_packages + stack_packages  }}"
