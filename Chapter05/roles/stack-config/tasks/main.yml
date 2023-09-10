@@ -1,6 +1,8 @@
 ---
 # tasks file for roles/stack-config
 
+# WordPress system user tasks
+
 - name: "add the wordpress group"
   ansible.builtin.group:
     name: "{{ wordpress_system.group }}"
@@ -14,10 +16,18 @@
     home: "{{ wordpress_system.home }}"
     state: "{{ wordpress_system.state }}"
 
+# NGINX configuration tasks
+
 - name: "copy the nginx.conf to /etc/nginx/"
   ansible.builtin.template:
     src: "nginx-nginx.conf.j2"
     dest: "/etc/nginx/nginx.conf"
+  notify: "restart nginx"
+
+- name: copy the default.conf to /etc/nginx/conf.d/
+  ansible.builtin.template:
+    src: "nginx-confd-default.conf.j2"
+    dest: "/etc/nginx/conf.d/default.conf"
   notify: "restart nginx"
 
 - name: "create the global directory in /etc/nginx/"
@@ -36,12 +46,6 @@
   ansible.builtin.template:
     src: "nginx-global-wordpress_shared.conf.j2"
     dest: "/etc/nginx/global/wordpress_shared.conf"
-  notify: "restart nginx"
-
-- name: copy the default.conf to /etc/nginx/conf.d/
-  ansible.builtin.template:
-    src: "nginx-confd-default.conf.j2"
-    dest: "/etc/nginx/conf.d/default.conf"
   notify: "restart nginx"
 
 - name: copy the www.conf to /etc/php-fpm.d/
