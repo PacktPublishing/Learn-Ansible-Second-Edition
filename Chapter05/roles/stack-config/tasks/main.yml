@@ -48,6 +48,8 @@
     dest: "/etc/nginx/global/wordpress_shared.conf"
   notify: "restart nginx"
 
+# PHP configuration tasks
+
 - name: copy the www.conf to /etc/php-fpm.d/
   ansible.builtin.template:
     src: "php-fpmd-www.conf.j2"
@@ -64,6 +66,8 @@
   with_items: "{{ php.ini }}"
   notify: "restart php-fpm"
 
+# Start PHP-FPM and NGINX
+
 - name: start php-fpm
   ansible.builtin.service:
     name: "{{ php_service_name }}"
@@ -73,6 +77,8 @@
   ansible.builtin.service:
     name: "nginx"
     state: "started"
+
+# MariaDB configuration tasks
 
 - name: configure the mariadb bind address
   ansible.builtin.lineinfile:
