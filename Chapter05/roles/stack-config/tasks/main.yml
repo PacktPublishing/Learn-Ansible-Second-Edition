@@ -80,15 +80,6 @@
 
 # MariaDB configuration tasks
 
-- name: configure the mariadb bind address
-  ansible.builtin.lineinfile:
-    dest: "{{ mariadb.server_config }}"
-    regexp: "#bind-address=0.0.0.0"
-    line: "bind-address={{ mariadb.bind }}"
-    backup: "yes"
-    backrefs: "yes"
-  when: ansible_os_family == 'RedHat'
-
 - name: start mariadb
   ansible.builtin.service:
     name: "mariadb"
