@@ -16,7 +16,6 @@ wordpress:
   username: "ansible"
   password: "password"
   email: "test@example.com"
-  theme: "hello-elementor"
   plugins:
     - "jetpack"
     - "wp-super-cache"

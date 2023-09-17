@@ -6,6 +6,8 @@
     wordpress_domain: "{{ ansible_ssh_host }}"
     os_family: "{{ ansible_distribution }} {{ ansible_distribution_version}}"
 
+# Install wp-cli
+
 - name: "download wp-cli"
   ansible.builtin.get_url:
     url: "{{ wp_cli.download }}"
@@ -15,6 +17,8 @@
   ansible.builtin.file:
     path: "{{ wp_cli.path }}"
     mode: "0755"
+
+# Create the database
 
 - name: "create the wordpress database"
   ansible.builtin.mysql_db:
@@ -28,6 +32,8 @@
     priv: "{{ wp_database.name }}.*:ALL"
     state: "present"
   with_items: "{{ mariadb.hosts }}"
+
+# Install wordpress
 
 - name: "are the wordpress files already there?"
   ansible.builtin.stat:
@@ -78,6 +84,8 @@
   become: true
   when: wp_installed.rc == 1
 
+# Install the plugins
+
 - name: "do we need to install the plugins?"
   ansible.builtin.shell: "{{ wp_cli.path }} plugin is-installed {{ item }}"
   args:
@@ -106,29 +114,3 @@
   become: true
   with_items: "{{ wordpress.plugins }}"
   when: wp_plugin_installed_skip == false
-# - name: "do we need to install the theme?"
-#   ansible.builtin.shell: "{{ wp_cli.path }} theme is-installed {{ wordpress.theme }}"
-#   args:
-#     chdir: "{{ wordpress_system.home }}"
-#   become_user: "{{ wordpress_system.user }}"
-#   become: true
-#   ignore_errors: true
-#   register: wp_theme_installed
-
-# - name: "set a fact if we don't need to install the theme"
-#   ansible.builtin.set_fact:
-#     wp_theme_installed_skip: "true"
-#   when: wp_theme_installed.failed == false
-
-# - name: "set a fact if we need to install the theme"
-#   ansible.builtin.set_fact:
-#     wp_theme_installed_skip: false
-#   when: wp_theme_installed.failed == true
-
-# - name: "install the theme if we need to or ignore if not"
-#   ansible.builtin.shell: "{{ wp_cli.path }} theme install {{ wordpress.theme }} --activate"
-#   args:
-#     chdir: "{{ wordpress_system.home }}"
-#   become_user: "{{ wordpress_system.user }}"
-#   become: true
-#   when: wp_theme_installed_skip == false
