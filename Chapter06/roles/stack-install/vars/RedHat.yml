@@ -1,0 +1,33 @@
+---
+# vars file for roles/stack-install
+
+nginx_repo:
+  name: "nginx"
+  description: "The mainline NGINX repo"
+  baseurl: "http://nginx.org/packages/mainline/rhel/9/$basearch/"
+  gpgcheck: "no"
+  enabled: "yes"
+
+system_packages:
+  - "python3-PyMySQL"
+  - "acl"
+
+extra_packages:
+  - "vim-enhanced"
+  - "git"
+  - "unzip"
+
+stack_packages:
+  - "mariadb-server"
+  - "mariadb"
+  - "nginx"
+  - "php-cli"
+  - "php-curl"
+  - "php-fpm"
+  - "php-gd"
+  - "php-intl"
+  - "php-mbstring"
+  - "php-mysqlnd"
+  - "php-pecl-zip"
+  - "php-soap"
+  - "php-xml"

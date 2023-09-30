@@ -1,0 +1,8 @@
+---
+# vars file for roles/stack-config
+
+mysql_socket_path: "/var/run/mysqld/mysqld.sock"
+
+php_fpm_path: "/etc/php/8.1/fpm/pool.d/www.conf"
+php_ini_path: "/etc/php/8.1/fpm/php.ini"
+php_service_name: "php8.1-fpm"

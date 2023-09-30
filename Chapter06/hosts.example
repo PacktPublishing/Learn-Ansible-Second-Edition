@@ -1,0 +1,12 @@
+rocky ansible_host=0.0.0.0.nip.io
+ubuntu ansible_host=1.1.1.1.nip.io
+
+[ansible_hosts]
+rocky
+ubuntu
+
+[ansible_hosts:vars]
+ansible_connection=ssh
+ansible_user=root
+ansible_private_key_file=~/.ssh/id_rsa
+host_key_checking=False

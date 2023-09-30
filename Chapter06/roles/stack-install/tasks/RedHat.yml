@@ -1,0 +1,25 @@
+---
+# tasks file for roles/stack-install on RedHat based systems
+
+# Add the NGINX mainline repo
+- name: "add the NGINX mainline repo"
+  ansible.builtin.yum_repository:
+    name: "{{ nginx_repo.name }}"
+    description: "{{ nginx_repo.description }}"
+    baseurl: "{{ nginx_repo.baseurl }}"
+    gpgcheck: "{{ nginx_repo.gpgcheck }}"
+    enabled: "{{ nginx_repo.enabled }}"
+
+# Update all of the installed packages
+- name: "update all of the installed packages"
+  ansible.builtin.dnf:
+    name: "*"
+    state: "latest"
+    update_cache: "yes"
+
+# Install system, extra and stack packages
+- name: "update cache and install the stack packages"
+  ansible.builtin.dnf:
+    state: "latest"
+    update_cache: "yes"
+    pkg: "{{ system_packages + extra_packages + stack_packages  }}"
