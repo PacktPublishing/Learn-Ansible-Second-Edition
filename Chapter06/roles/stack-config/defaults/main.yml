@@ -33,3 +33,7 @@ mariadb:
 
 selinux:
   http_permissive: true
+
+firewall_comands:
+  - "firewall-cmd --zone=public --add-port=80/tcp --permanent"
+  - "firewall-cmd --zone=public --add-port=80/tcp"

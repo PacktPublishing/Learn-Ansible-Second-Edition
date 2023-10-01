@@ -105,7 +105,7 @@
     priv: "*.*:ALL,GRANT"
     login_user: "{{ mariadb.username }}"
     login_unix_socket: "{{ mysql_socket_path }}"
-  with_items: "{{ mariadb.hosts }}"
+  with_items: "{{ mariadb.hosts | unique }}"
   when: mycnf.stat.exists == false
 
 - name: set up .my.cnf file
@@ -125,9 +125,39 @@
     db: "test"
     state: "absent"
 
-# set the selinux allowing httpd_t to be permissive is required
+# SELinux configuration tasks
+
 - name: set the selinux allowing httpd_t to be permissive is required
   ansible.builtin.selinux_permissive:
     name: httpd_t
     permissive: true
   when: selinux.http_permissive == true and ansible_os_family == 'RedHat'
+
+# Firewalld configuration tasks
+
+- name: "check to see if the ~/firewall-configured file exists"
+  ansible.builtin.stat:
+    path: "~/firewall-configured"
+  register: firewall_configured
+
+- name: "check if firewalld is running"
+  ansible.builtin.shell: "firewall-cmd --state"
+  register: fireweall_status
+  when: ansible_os_family == 'RedHat'
+
+- name: "set a fact so the playbook can continue if running on a Debian based system"
+  ansible.builtin.set_fact:
+    fireweall_status:
+      stdout: "notrunning"
+  when: ansible_os_family == 'Debian'
+
+- name: "run the firewall-cmd commands if the firewall-cmd --state command returns running"
+  ansible.builtin.shell: "{{ item }}"
+  with_items: "{{ firewall_comands }}"
+  when: fireweall_status.stdout == "running" and ansible_os_family == 'RedHat' and firewall_configured.stat.exists == false
+
+- name: "create the ~/firewall-configured file"
+  ansible.builtin.file:
+    path: "~/firewall-configured"
+    state: "touch"
+  when: firewall_configured.stat.exists == false
