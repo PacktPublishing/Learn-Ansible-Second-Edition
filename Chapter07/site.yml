@@ -1,0 +1,15 @@
+---
+
+- name: Bootstrap the Windows instance
+  hosts: ansible_hosts
+  gather_facts: true
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - roles/iis
+    - roles/asp
+    - roles/user
+    - roles/choc
+    - roles/info
