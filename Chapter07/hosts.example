@@ -6,5 +6,5 @@ WindowsServer
 [ansible_hosts:vars]
 ansible_connection=winrm
 ansible_user="azureuser"
-ansible_password="{{lookup('ansible.builtin.file', 'VMPASSWORD') }}"
+ansible_password="{{ lookup('ansible.builtin.file', 'VMPASSWORD') }}"
 ansible_winrm_server_cert_validation=ignore
