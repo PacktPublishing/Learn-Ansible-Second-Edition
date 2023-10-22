@@ -1,8 +1,7 @@
 ---
 # tasks file for roles/choc
 
-- name: install software using chocolatey
+- name: "install software using chocolatey"
   chocolatey.chocolatey.win_chocolatey:
-    name: "{{ item }}"
+    name: "{{ apps }}"
     state: "present"
-  with_items: "{{ apps }}"
