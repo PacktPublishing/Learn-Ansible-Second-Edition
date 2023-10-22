@@ -1,9 +1,8 @@
 ---
 
-- name: Bootstrap the Windows instance
-  hosts: ansible_hosts
+- hosts: ansible_hosts
   gather_facts: true
-
+  
   vars_files:
     - group_vars/common.yml
 
