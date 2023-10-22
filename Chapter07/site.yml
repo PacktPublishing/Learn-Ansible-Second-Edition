@@ -9,7 +9,7 @@
 
   roles:
     - roles/iis
-    - roles/asp
+    - roles/dotnet
     - roles/user
     - roles/choc
     - roles/info

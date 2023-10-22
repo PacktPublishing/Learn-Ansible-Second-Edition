@@ -1,7 +1,7 @@
 ---
 # tasks file for roles/asp
 
-- name: enable .net
+- name: "enable .net"
   ansible.windows.win_feature:
     name:
       - "Net-Framework-Features"
@@ -10,17 +10,17 @@
     state: "present"
   notify: restart iis
 
-- name: create the folder for our asp.net app
+- name: "create the folder for our asp.net app"
   ansible.windows.win_file:
     path: "{{ aspx_document_root }}"
     state: "directory"
 
-- name: create an aspx file from a template
+- name: "create an aspx file from a template"
   ansible.windows.win_template:
     src: "default.aspx.j2"
     dest: "{{ aspx_document_root }}{{ aspx_file }}"
 
-- name: ensure the default web application exists
+- name: "ensure the default web application exists"
   community.windows.win_iis_webapplication:
     name: "Default"
     state: "present"

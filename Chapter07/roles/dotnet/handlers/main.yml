@@ -1,7 +1,7 @@
 ---
 # handlers file for roles/asp
 
-- name: restart iis
+- name: "restart iis"
   ansible.windows.win_service:
-    name: w3svc
-    state: restarted
+    name: "w3svc"
+    state: "restarted"
