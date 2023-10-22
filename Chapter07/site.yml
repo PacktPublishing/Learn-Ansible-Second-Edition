@@ -11,5 +11,5 @@
     - roles/iis
     - roles/dotnet
     - roles/user
-    - roles/choc
+    - roles/choco
     - roles/info
