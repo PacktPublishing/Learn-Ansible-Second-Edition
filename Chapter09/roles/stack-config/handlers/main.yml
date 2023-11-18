@@ -1,0 +1,14 @@
+---
+# handlers file for roles/stack-config
+
+- name: "restart nginx"
+  ansible.builtin.service:
+    name: "nginx"
+    state: "restarted"
+    enabled: "yes"
+
+- name: "restart php-fpm"
+  ansible.builtin.service:
+    name: "{{ php_service_name }}"
+    state: "restarted"
+    enabled: "yes"

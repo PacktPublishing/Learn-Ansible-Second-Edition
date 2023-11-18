@@ -1,0 +1,20 @@
+---
+
+# Application and basicAzure Resource Configuration
+##################################################
+
+debug_output: true
+genterate_key_if_does_exist: false
+
+app:
+  name: "iac-wordpress" # don't get too creative
+  shortname: "iacwp" # all lower-case, all one word
+  location: "westeurope" # loction of where the resources are to be created
+  location_short: "euw" # short name for the location
+  env: "prod" # enviroment tag for the app
+  public_dns_name: "iacwp" # the public dns name for the app
+
+common_tags:
+  "project": "{{ app.name }}"
+  "environment": "{{ app.env }}"
+  "deployed_by": "ansible"

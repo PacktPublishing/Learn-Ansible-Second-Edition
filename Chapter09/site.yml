@@ -1,0 +1,28 @@
+---
+
+- name: "Deploy and configure the Azure Environment"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - roles/secrets
+    - roles/azure
+
+- name: "Deploy and configure the Azure Environment"
+  hosts: vmgroup
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - roles/secrets
+    - roles/stack-install
+    - roles/stack-config
+    - wordpress
