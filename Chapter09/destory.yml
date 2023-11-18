@@ -14,9 +14,14 @@
     - group_vars/common.yml
 
   tasks:
-    - name: Terminate all resources in the resource group
+    - name: "Terminate all resources in the resource group"
       azure.azcollection.azure_rm_resourcegroup:
         name: "{{ resource_group_name }}"
         location: "{{ location }}"
         state: absent
         force_delete_nonempty: true
+
+    - name: "Delete the secrets.yml file"
+      ansible.builtin.file:
+        path: "group_vars/secrets.yml"
+        state: "absent"
