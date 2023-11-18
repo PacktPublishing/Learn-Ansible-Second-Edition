@@ -3,7 +3,7 @@
 # Application and basicAzure Resource Configuration
 ##################################################
 
-debug_output: true
+debug_output: false
 genterate_key_if_does_exist: false
 
 app:
