@@ -22,7 +22,6 @@ load_balancer_name: "{{ dict.load_balancer }}-{{ app.name }}-{{app.env}}-{{ app.
 load_balancer_public_ip_name: "{{ dict.public_ip }}-{{ load_balancer_name }}"
 nsg_name: "{{ dict.nsg }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
 resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-storage_account_name: "{{ dict.storage_account }}{{ app.shortname }}{{ short_random_hash }}"
 virtual_network_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
 vm_name: "{{ dict.virtual_machine }}-admin-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
 vnet_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
@@ -40,21 +39,11 @@ vnet_config:
         service_endpoints: "Microsoft.Storage",
       }
 
-subnet_for_vms: "{{ dict.subnet }}-vms-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-subnet_for_endpoints: "{{ dict.subnet }}-endpoints-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-subnet_for_database: "{{ dict.subnet }}-database-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-
 trusted_ips:
   - ""
 
 dynamic_ips:
   - "{{ your_public_ip }}" # The IP address of whomever is running Ansible
-
-load_balancer:
-  ssh_port: "22"
-  ssh_port_backend: "22"
-  http_port: "80"
-  http_port_backend: "80"
 
 nsg_rules:
   - name: "allowHTTP"
@@ -73,6 +62,12 @@ nsg_rules:
     access: "Allow"
     priority: "150"
     direction: "Inbound"
+
+load_balancer:
+  ssh_port: "22"
+  ssh_port_backend: "22"
+  http_port: "80"
+  http_port_backend: "80"
 
 # Virtual Machine
 ##################################################
