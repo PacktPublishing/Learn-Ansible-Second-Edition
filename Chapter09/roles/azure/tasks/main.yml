@@ -95,7 +95,7 @@
       - name: "{{ load_balancer_name }}-backend-address-pool"
     probes:
       - name: "{{ load_balancer_name }}-http-probe"
-        port: "80"
+        port: "{{ load_balancer.http_port_backend }}"
         fail_count: "3"
         protocol: "Tcp"
     load_balancing_rules:
