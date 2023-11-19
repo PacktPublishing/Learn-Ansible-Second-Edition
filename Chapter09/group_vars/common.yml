@@ -4,7 +4,7 @@
 ##################################################
 
 debug_output: false
-genterate_key_if_does_exist: false
+genterate_key: false
 
 app:
   name: "learnansible-wordpress" # don't get too creative

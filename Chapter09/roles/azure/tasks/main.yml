@@ -157,7 +157,7 @@
     name: "{{ ansible_user_id }}"
     generate_ssh_key: "yes"
     ssh_key_file: "~/.ssh/id_rsa"
-  when: genterate_key_if_does_exist
+  when: genterate_key
 
 - name: Create the admin virtual machine
   azure.azcollection.azure_rm_virtualmachine:
