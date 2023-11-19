@@ -11,7 +11,7 @@
   roles:
     - roles/azure
 
-- name: "Deploy and configure the Azure Environment"
+- name: "Install and configure Wordpress"
   hosts: vmgroup
   gather_facts: true
   become: true
