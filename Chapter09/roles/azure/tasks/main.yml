@@ -35,7 +35,6 @@
     service_endpoints:
       - service: "{{ item.service_endpoints }}"
   with_items: "{{ vnet_config.subnets }}"
-  when: "item.name is not search 'database'"
   register: "subnet_output"
 
 - name: "Debug - Subnets result"
