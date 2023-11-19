@@ -9,7 +9,6 @@
     - group_vars/common.yml
 
   roles:
-    - roles/secrets
     - roles/azure
 
 - name: "Deploy and configure the Azure Environment"
@@ -25,4 +24,4 @@
     - roles/secrets
     - roles/stack-install
     - roles/stack-config
-    - wordpress
+    - roles/wordpress

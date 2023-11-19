@@ -43,7 +43,6 @@
     var: "subnet_output"
   when: debug_output
 
-
 - name: "Find out your current public IP address using https://ipify.org/"
   community.general.ipify_facts:
   register: public_ip_output
