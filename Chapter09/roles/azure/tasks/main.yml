@@ -121,9 +121,9 @@
            
 - name: "Create the network interface for the wordpress vm"
   azure.azcollection.azure_rm_resource:
-    api_version: '2019-09-01'
+    api_version: "2023-05-01"
     resource_group: "{{ resource_group_output.state.name }}"
-    idempotency: "yes"
+    idempotency: true
     provider: "network"
     resource_type: "networkinterfaces"
     resource_name: "{{ dict.network_interface }}-{{ vm_name }}"
