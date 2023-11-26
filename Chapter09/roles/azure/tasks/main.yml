@@ -195,4 +195,4 @@
     host: "{{ public_ip_output.state.ip_address }}"
     port: "{{ load_balancer.ssh_port }}"
     delay: 10
-    timeout: 320
+    timeout: 300
