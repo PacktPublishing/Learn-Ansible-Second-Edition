@@ -29,6 +29,7 @@
   ansible.builtin.mysql_user:
     name: "{{ wp_database.username }}"
     password: "{{ wp_database.password }}"
+    host: "{{ item }}"
     priv: "{{ wp_database.name }}.*:ALL"
     state: "present"
   with_items: "{{ mariadb.hosts }}"
