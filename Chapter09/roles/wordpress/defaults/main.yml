@@ -8,7 +8,7 @@ wp_cli:
 wp_database:
   name: "wordpress"
   username: "wordpress"
-  password: "{{ wp_password }}"
+  password: "{{ db_password }}"
 
 wordpress:
   domain: "http://{{ app.public_dns_name }}.{{ app.location }}.cloudapp.azure.com/"

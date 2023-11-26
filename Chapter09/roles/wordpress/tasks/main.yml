@@ -78,7 +78,7 @@
   register: wp_installed
 
 - name: "install wordpress if needed"
-  ansible.builtin.shell: "{{ wp_cli.path }} core install --url='{{ wordpress.domain }}' --title='{{ wordpress.title }}' --admin_user={{ wordpress.username }} --admin_password={{ wordpress.password }} --admin_email={{ wordpress.email }}"
+  ansible.builtin.shell: "{{ wp_cli.path }} core install --url='{{ wordpress.domain }}' --title='{{ wordpress.title }}' --admin_email='{{ wordpress.email }}' --admin_user='{{ wordpress.username }}' --admin_password='{{ wordpress.password }}'"
   args:
     chdir: "{{ wordpress_system.home }}"
   become_user: "{{ wordpress_system.user }}"
