@@ -13,3 +13,4 @@
   roles:
     - roles/vpc
     - roles/subnets
+    - roles/gateway

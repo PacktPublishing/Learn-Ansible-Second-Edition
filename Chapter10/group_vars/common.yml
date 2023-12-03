@@ -11,13 +11,18 @@ app:
   env: "prod" # enviroment tag for the app
   public_dns_name: "learnansible" # the public dns name for the app
 
-region: "{{ app.region }}"
+# Resource Names
+##################################################
+
+vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
+internet_gateway_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.internet_gateway }}"
+internet_gateway_route_name: "{{ internet_gateway_name }}-{{ playbook_dict.route }}"
 
 # VPC and Subnets Configuration
 ##################################################
 
 vpc:
-  cidr_block: "10.0.0.0/23"
+  cidr_block: "10.0.0.0/23" # This must be at least a /23 or larger for the subnets to be created
   dns_hostnames: true
   dns_support: true
   subnet_size: "27"
@@ -36,12 +41,6 @@ subnet_role_database: "database"
 subnet_role_storage: "storage"
 subnet_role_public: "public"
 
-# Resource Names
-##################################################
-
-vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
-
-
 # Dictionary
 ##################################################
 
@@ -50,4 +49,11 @@ playbook_dict:
   ansible_warning: "Resource managed by Ansible"
   vpc: "vpc"
   subnet: "subnet"
+  internet_gateway: "internet_gateway"
+  route: "route"
   
+
+# AWS Configuration, some defaults from other variables
+##################################################
+
+region: "{{ app.region }}"
