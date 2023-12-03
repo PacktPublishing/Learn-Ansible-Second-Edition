@@ -14,7 +14,7 @@
       environment: "{{ app.env }}"
       deployedBy: "{{ playbook_dict.deployedBy }}"
       description: "{{ playbook_dict.ansible_warning }}"
-      use: "{{ subnet_name }}"
+      role: "{{ subnet_role }}"
   loop: "{{ az_zones_from_main.availability_zones }}"
   loop_control:
     loop_var: az_item

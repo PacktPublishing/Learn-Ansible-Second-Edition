@@ -13,10 +13,9 @@ app:
 
 region: "{{ app.region }}"
 
-# VPC Configuration
+# VPC and Subnets Configuration
 ##################################################
 
-vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
 vpc:
   cidr_block: "10.0.0.0/23"
   dns_hostnames: true
@@ -24,10 +23,25 @@ vpc:
   subnet_size: "27"
   subnets:
     - name: "ec2"
+      role: "{{ subnet_role_compute }}"
     - name: "rds"
+      role: "{{ subnet_role_database }}"
     - name: "efs"
+      role: "{{ subnet_role_storage }}"    
     - name: "dmz"
-    
+      role: "{{ subnet_role_public }}"
+
+subnet_role_compute: "compute"
+subnet_role_database: "database"
+subnet_role_storage: "storage"
+subnet_role_public: "public"
+
+# Resource Names
+##################################################
+
+vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
+
+
 # Dictionary
 ##################################################
 
