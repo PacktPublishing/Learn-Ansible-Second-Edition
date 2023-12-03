@@ -1,0 +1,73 @@
+---
+
+# Application and Resource Configuration
+##################################################
+
+debug_output: true
+
+app:
+  name: "learnansible-wordpress" # don't get too creative
+  shortname: "ansiblewp" # all lower-case, all one word
+  region: "eu-west-2" # loction of where the resources are to be created
+  env: "prod" # enviroment tag for the app
+  public_dns_name: "learnansible" # the public dns name for the app
+
+region: "{{ app.region }}"
+
+# VPC Configuration
+##################################################
+
+vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
+vpc:
+  cidr_block: "10.0.0.0/23"
+  dns_hostnames: true
+  dns_support: true
+  subnet_size: "27"
+  subnets:
+    - name: "ec2"
+    - name: "rds"
+    - name: "efs"
+    - name: "dmz"
+    
+# Resource names
+##################################################
+
+
+vpc_igw_name: "{{ app.name }}-{{ app.env }}-{{ dict.igw }}"
+vpc_route_table_name: "{{ app.name }}-{{ app.env }}-{{ dict.route_table }}"
+vpc_security_group_name_efs: "{{ app.name }}-{{ app.env }}-efs-{{ dict.security_group }}"
+vpc_security_group_name_rds: "{{ app.name }}-{{ app.env }}-rds-{{ dict.security_group }}"
+vpc_security_group_name_web: "{{ app.name }}-{{ app.env }}-web-{{ dict.security_group }}"
+alb_name: "{{ app.name }}-{{ app.env }}-{{ dict.application_load_balancer }}"
+alb_target_group_name: "{{ app.name }}-{{ app.env }}-{{ dict.application_load_balancer_target_group }}"
+efs_name: "{{ app.name }}-{{ app.env }}-{{ dict.elastic_file_system }}"
+rds_db_instance_name: "{{ app.name }}-{{ app.env }}-{{ dict.rds_database }}"
+ec2_instance_name_admin: "{{ app.name }}-{{ app.env }}-admin-{{ dict.ec2_instance }}"
+lauch_configuration_name: "{{ app.name }}-{{ app.env }}-web-{{ dict.lauch_configuration }}"
+asg_name: "{{ app.name }}-{{ app.env }}-web-{{ dict.auto_scaling_group }}"
+
+
+
+
+
+
+
+
+
+# Dictionary
+##################################################
+
+playbook_dict:
+  ansible_warning: "Resource managed by Ansible"
+  vpc: "vpc"
+  subnet: "subnet"
+  igw: "igw"
+  route_table: "route-table"
+  security_group: "security-group"
+  application_load_balancer: "lb"
+  application_load_balancer_target_group: "lbtg"
+  elastic_file_system: "efs"
+  rds_database: "rds"
+  ec2_instance: "ec2"
+  auto_scaling_group: "asg"
+  lauch_configuration: "lc"

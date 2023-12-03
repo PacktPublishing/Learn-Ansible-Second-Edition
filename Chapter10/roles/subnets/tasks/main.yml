@@ -1,0 +1,16 @@
+---
+# tasks file for roles/subnets
+
+- name: "Create all subnets"
+  include_tasks: create_subnet.yml
+  loop: "{{ vpc.subnets }}"
+  loop_control:
+    loop_var: subnet_item
+    index_var: subnet_index
+  vars:
+    subnet_name: "{{ subnet_item.name }}"
+
+- name: "Debug - Subnet creation result"
+  ansible.builtin.debug:
+    var: "subnet_creation"
+  when: debug_output

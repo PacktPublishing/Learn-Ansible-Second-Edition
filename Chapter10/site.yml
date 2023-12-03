@@ -1,0 +1,15 @@
+---
+
+- name: "Deploy and configure the AWS Environment"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    state: "present"
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - roles/vpc
+    - roles/subnets
