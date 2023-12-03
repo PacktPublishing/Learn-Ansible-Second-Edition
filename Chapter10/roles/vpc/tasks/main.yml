@@ -11,10 +11,10 @@
     state: "{{ state }}"
     tags:
       Name: "{{ vpc_name }}"
-      Description: "{{ playbook_dict.ansible_warning }}"
-      Project: "{{ app.name }}"
-      Environment: "{{ app.env }}"
-      Deployed_by: "Ansible"
+      projectName: "{{ app.name }}"
+      environment: "{{ app.env }}"
+      deployedBy: "{{ playbook_dict.deployedBy }}"
+      description: "{{ playbook_dict.ansible_warning }}"
   register: vpc_output
 
 - name: "Debug - VPC result"

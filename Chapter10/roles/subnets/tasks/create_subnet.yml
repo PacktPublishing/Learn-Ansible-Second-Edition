@@ -1,31 +1,21 @@
 ---
 # tasks file for roles/subnets
 
-- name: "Get some information on the available zones"
-  amazon.aws.aws_az_info:
-    region: "{{ region }}"
-  register: zones_output
-
-- name: "Debug - Zones result"
-  ansible.builtin.debug:
-    var: "zones_output"
-  when: debug_output
-
 - name: "Create subnet in the availability zone"
   amazon.aws.ec2_vpc_subnet:
     region: "{{ region }}"
     state: "{{ state }}"
     vpc_id: "{{ vpc_output.vpc.id }}"
-    cidr: "{{ vpc_output.vpc.cidr_block | ansible.utils.ipsubnet(vpc.subnet_size, az_loop_index + (subnet_index * zones_output.availability_zones|length)) }}"
+    cidr: "{{ vpc_output.vpc.cidr_block | ansible.utils.ipsubnet(vpc.subnet_size, az_loop_index + (subnet_index * az_zones_from_main.availability_zones|length)) }}"
     az: "{{ az_item.zone_name }}"
     tags:
       Name: "{{ subnet_name }}-{{ playbook_dict.subnet }}-{{ az_item.zone_id }}"
-      Description: "{{ playbook_dict.ansible_warning }}"
-      Project: "{{ app.name }}"
-      Environment: "{{ app.env }}"
-      Deployed_by: "Ansible"
-  loop: "{{ zones_output.availability_zones }}"
+      projectName: "{{ app.name }}"
+      environment: "{{ app.env }}"
+      deployedBy: "{{ playbook_dict.deployedBy }}"
+      description: "{{ playbook_dict.ansible_warning }}"
+      use: "{{ subnet_name }}"
+  loop: "{{ az_zones_from_main.availability_zones }}"
   loop_control:
     loop_var: az_item
     index_var: az_loop_index
-  register: subnet_creation

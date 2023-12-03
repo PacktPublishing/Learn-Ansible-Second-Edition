@@ -1,6 +1,16 @@
 ---
 # tasks file for roles/subnets
 
+- name: "Get some information on the available zones"
+  amazon.aws.aws_az_info:
+    region: "{{ region }}"
+  register: zones_output
+
+- name: "Debug - Zones result"
+  ansible.builtin.debug:
+    var: "zones_output"
+  when: debug_output
+
 - name: "Create all subnets"
   include_tasks: create_subnet.yml
   loop: "{{ vpc.subnets }}"
@@ -9,8 +19,10 @@
     index_var: subnet_index
   vars:
     subnet_name: "{{ subnet_item.name }}"
+    az_zones_from_main: "{{ zones_output }}"
+  register: subnet_output  
 
-- name: "Debug - Subnet creation result"
+- name: "Debug - All Subnets"
   ansible.builtin.debug:
-    var: "subnet_creation"
+    var: "subnet_output"
   when: debug_output
