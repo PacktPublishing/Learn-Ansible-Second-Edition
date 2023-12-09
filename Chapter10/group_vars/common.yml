@@ -1,5 +1,4 @@
 ---
-
 # Application and Resource Configuration
 ##################################################
 
@@ -32,7 +31,7 @@ vpc:
     - name: "rds"
       role: "{{ subnet_role_database }}"
     - name: "efs"
-      role: "{{ subnet_role_storage }}"    
+      role: "{{ subnet_role_storage }}"
     - name: "dmz"
       role: "{{ subnet_role_public }}"
 
@@ -40,6 +39,57 @@ subnet_role_compute: "compute"
 subnet_role_database: "database"
 subnet_role_storage: "storage"
 subnet_role_public: "public"
+
+# Security Group Configuration
+##################################################
+
+security_groups:
+  - name: "{{ app.name  }}-elb-{{ playbook_dict.security_group }}"
+    description: "opens port 80 and 443 to the world"
+    id_var_name: "elb_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "allow all on port 80"
+      - proto: "tcp"
+        from_port: "443"
+        to_port: "443"
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "allow all on port 443"
+  - name: "{{ app.name }}-ec2-{{ playbook_dict.security_group }}"
+    description: "opens port 22 to a trusted IP and port 80 to the elb group"
+    id_var_name: "ec2_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "22"
+        to_port: "22"
+        cidr_ip: "{{ your_public_ip }}"
+        rule_desc: "allow {{ your_public_ip }} access to port 22"
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        group_id: "{{ elb_group_id | default('') }}"
+        rule_desc: "allow access to port 80 from ELB"
+  - name: "{{ app.name }}-rds-{{ playbook_dict.security_group }}"
+    description: "opens port 3306 to the ec2 instances"
+    id_var_name: "rds_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "3306"
+        to_port: "3306"
+        group_id: "{{ ec2_group_id | default('') }}"
+        rule_desc: "allow {{ ec2_group_id | default('') }} access to port 3306"
+  - name: "{{ app.name }}-efs-{{ playbook_dict.security_group }}"
+    description: "opens port 2049 to the ec2 instances"
+    id_var_name: "efs_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "2049"
+        to_port: "2049"
+        group_id: "{{ ec2_group_id | default('') }}"
+        rule_desc: "allow {{ ec2_group_id | default('') }} access to port 2049"
 
 # Dictionary
 ##################################################
@@ -49,9 +99,9 @@ playbook_dict:
   ansible_warning: "Resource managed by Ansible"
   vpc: "vpc"
   subnet: "subnet"
-  internet_gateway: "internet_gateway"
+  internet_gateway: "internet-gateway"
   route: "route"
-  
+  security_group: "security-group"
 
 # AWS Configuration, some defaults from other variables
 ##################################################
