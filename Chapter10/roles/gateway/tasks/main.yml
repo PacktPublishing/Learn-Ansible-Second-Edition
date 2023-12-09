@@ -2,7 +2,7 @@
 # tasks file for roles/gateway
 
 - name: "Create an Internet Gateway"
-  ec2_vpc_igw:
+  amazon.aws.ec2_vpc_igw:
     region: "{{ region }}"
     state: "{{ state }}"
     vpc_id: "{{ vpc_output.vpc.id }}"
@@ -21,7 +21,7 @@
   when: debug_output
 
 - name: "Create a route table so the internet gateway can be used by the public subnets"
-  ec2_vpc_route_table:
+  amazon.aws.ec2_vpc_route_table:
     region: "{{ region }}"
     state: "{{ state }}"
     vpc_id: "{{ vpc_output.vpc.id }}"

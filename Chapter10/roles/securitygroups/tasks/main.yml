@@ -14,12 +14,6 @@
   ansible.builtin.set_fact:
     your_public_ip: "{{ public_ip_output.ansible_facts.ipify_public_ip }}/32"
 
-# - name: "Dynamically initialize security group ID variables"
-#   ansible.builtin.set_fact:
-#     "{{ item.id_var_name }}": ""
-#   loop: "{{ security_groups }}"
-#   when: "'{{ item.id_var_name }}' is not defined"
-
 - name: "Create the base security groups"
   amazon.aws.ec2_security_group:
     region: "{{ region }}"
