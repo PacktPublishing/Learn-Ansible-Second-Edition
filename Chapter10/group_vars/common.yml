@@ -2,13 +2,12 @@
 # Application and Resource Configuration
 ##################################################
 
-debug_output: true
+debug_output: false
 
 app:
   name: "learnansible" # don't get too creative
   region: "eu-west-1" # loction of where the resources are to be created
   env: "prod" # enviroment tag for the app
-  public_dns_name: "learnansible" # the public dns name for the app
 
 # Resource Names
 ##################################################
@@ -21,7 +20,7 @@ internet_gateway_route_name: "{{ internet_gateway_name }}-{{ playbook_dict.route
 ##################################################
 
 vpc:
-  cidr_block: "10.0.0.0/23" # This must be at least a /23 or larger for the subnets to be created
+  cidr_block: "10.0.0.0/22" # This must be at least a /23 or larger for the subnets to be created
   dns_hostnames: true
   dns_support: true
   subnet_size: "27"

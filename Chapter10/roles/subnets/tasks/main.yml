@@ -21,7 +21,7 @@
     subnet_name: "{{ subnet_item.name }}"
     subnet_role: "{{ subnet_item.role }}"
     az_zones_from_main: "{{ zones_output }}"
-  register: subnet_output  
+  register: subnet_output
 
 - name: "Debug - All Subnets"
   ansible.builtin.debug:
