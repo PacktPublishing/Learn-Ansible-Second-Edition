@@ -1,6 +1,6 @@
 ---
 
-- name: "Deploy and configure the AWS Environment"
+- name: "Destroy the AWS Environment created by the site.yml playbook"
   hosts: localhost
   connection: local
   gather_facts: true
@@ -13,7 +13,7 @@
 
   tasks:
 
-    - name: Create a reversed list of the security group names
+    - name: "Create a reversed list of the security group names"
       set_fact:
         security_groups_names_reversed: "{{ security_groups | map(attribute='name') | list | reverse }}"
 
@@ -43,7 +43,7 @@
       register: the_route_tables
       when: the_vpc.vpcs | length > 0
 
-    - name: Delete the Route Table
+    - name: "Delete the Route Table"
       amazon.aws.ec2_vpc_route_table:
         route_table_id: "{{ item.route_table_id }}"
         vpc_id: "{{ the_vpc.vpcs[0].id }}"
