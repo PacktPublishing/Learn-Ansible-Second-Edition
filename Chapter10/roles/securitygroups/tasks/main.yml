@@ -21,7 +21,7 @@
     vpc_id: "{{ vpc_output.vpc.id }}"
     name: "{{ item.name }}"
     description: "{{ item.description }}"
-    purge_rules: "false"
+    purge_rules: false
     tags:
       "Name": "{{ item.name }}"
       "projectName": "{{ app.name }}"
@@ -54,7 +54,7 @@
     vpc_id: "{{ vpc_output.vpc.id }}"
     name: "{{ item.name }}"
     description: "{{ item.description }}"
-    purge_rules: "false"
+    purge_rules: false
     rules: "{{ item.rules }}"
   loop: "{{ security_groups }}"
   register: security_groups_with_rules_output
