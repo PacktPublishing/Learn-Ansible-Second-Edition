@@ -1,0 +1,7 @@
+---
+
+efs_targets:
+{% for item in subnet_storage_ids %}
+      - subnet_id: "{{ item }}"
+        security_groups: [ "{{ efs_group_id }}" ]
+{% endfor %}
