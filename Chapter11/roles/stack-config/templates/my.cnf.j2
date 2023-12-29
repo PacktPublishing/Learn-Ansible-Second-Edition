@@ -1,0 +1,5 @@
+# {{ ansible_managed }}
+[client]
+host='{{ aws_endpoints.rds }}'
+user='{{ wp_database.username }}'
+password='{{ wp_database.password }}'

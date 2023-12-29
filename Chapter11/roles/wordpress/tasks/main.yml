@@ -1,0 +1,117 @@
+---
+# tasks file for roles/wordpress
+
+- name: "set a fact for the wordpress domain"
+  ansible.builtin.set_fact:
+    wordpress_domain: "{{ ansible_ssh_host }}"
+    os_family: "{{ ansible_distribution }} {{ ansible_distribution_version}}"
+
+# Install wp-cli
+
+- name: "download wp-cli"
+  ansible.builtin.get_url:
+    url: "{{ wp_cli.download }}"
+    dest: "{{ wp_cli.path }}"
+
+- name: "update permissions of wp-cli to allow anyone to execute it"
+  ansible.builtin.file:
+    path: "{{ wp_cli.path }}"
+    mode: "0755"
+
+# Create the database
+
+# - name: "create the wordpress database"
+#   ansible.builtin.mysql_db:
+#     db: "{{ wp_database.name }}"
+#     state: "present"
+
+# - name: "create the user for the wordpress database"
+#   ansible.builtin.mysql_user:
+#     name: "{{ wp_database.username }}"
+#     password: "{{ wp_database.password }}"
+#     host: "{{ item }}"
+#     priv: "{{ wp_database.name }}.*:ALL"
+#     state: "present"
+#   with_items: "{{ mariadb.hosts }}"
+
+# Install wordpress
+
+- name: "are the wordpress files already there?"
+  ansible.builtin.stat:
+    path: "{{ wordpress_system.home }}/index.php"
+  register: wp_installed
+
+- name: "download wordpresss"
+  ansible.builtin.shell: "{{ wp_cli.path }} core download"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  when: wp_installed.stat.exists == False
+
+- name: "set the correct permissions on the homedir"
+  ansible.builtin.file:
+    path: "{{ wordpress_system.home }}"
+    mode: "0755"
+  when: wp_installed.stat.exists == False
+
+- name: "is wordpress already configured?"
+  ansible.builtin.stat:
+    path: "{{ wordpress_system.home }}/wp-config.php"
+  register: wp_configured
+
+- name: "configure wordpress"
+  ansible.builtin.shell: "{{ wp_cli.path }} core config --dbhost={{ aws_endpoints.rds }} --dbname={{ wp_database.name }} --dbuser={{ wp_database.username }} --dbpass={{ wp_database.password }}"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  when: wp_configured.stat.exists == False
+
+- name: "do we need to install wordpress?"
+  ansible.builtin.shell: "{{ wp_cli.path }} core is-installed"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  ignore_errors: true
+  register: wp_installed
+
+- name: "install wordpress if needed"
+  ansible.builtin.shell: "{{ wp_cli.path }} core install --url='{{ wordpress.domain }}' --title='{{ wordpress.title }}' --admin_email='{{ wordpress.email }}' --admin_user='{{ wordpress.username }}' --admin_password='{{ wordpress.password }}'"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  when: wp_installed.rc == 1
+
+# Install the plugins
+
+- name: "do we need to install the plugins?"
+  ansible.builtin.shell: "{{ wp_cli.path }} plugin is-installed {{ item }}"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  with_items: "{{ wordpress.plugins }}"
+  ignore_errors: true
+  register: wp_plugin_installed
+
+- name: "set a fact if we don't need to install the plugins"
+  ansible.builtin.set_fact:
+    wp_plugin_installed_skip: true
+  when: wp_plugin_installed.failed is undefined
+
+- name: "set a fact if we need to install the plugins"
+  ansible.builtin.set_fact:
+    wp_plugin_installed_skip: false
+  when: wp_plugin_installed.failed is defined
+
+- name: "install the plugins if we need to or ignore if not"
+  ansible.builtin.shell: "{{ wp_cli.path }} plugin install {{ item }} --activate"
+  args:
+    chdir: "{{ wordpress_system.home }}"
+  become_user: "{{ wordpress_system.user }}"
+  become: true
+  with_items: "{{ wordpress.plugins }}"
+  when: wp_plugin_installed_skip == false

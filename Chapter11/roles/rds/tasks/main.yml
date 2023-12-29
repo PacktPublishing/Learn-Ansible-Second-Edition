@@ -26,7 +26,7 @@
   set_fact:
     rds_group_id: "{{ item.group_id }}"
   loop: "{{ security_groups_with_rules_output.results }}"
-  when: item.group_name is search("{{ rds_seach_string }}")
+  when: item.group_name is search('rds_seach_string')
 
 - name: "Debug: RDS Security Group Output"
   debug:
