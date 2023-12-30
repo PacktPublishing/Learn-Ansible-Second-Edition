@@ -51,7 +51,7 @@ ec2:
   ami:
     owners: "099720109477"
     filters:
-      name: "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
+      name: "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
       virtualization_type: "hvm"
   keypair:
     name: "ssh_keypair"
@@ -67,7 +67,7 @@ rds:
   db_name: "{{ app.name }}"
   instance_type: "db.t2.micro"
   engine: "mysql"
-  engine_version: "5.7"
+  engine_version: "8.0"
   allocated_storage: "5"
 
 # VPC and Subnets Configuration
