@@ -43,7 +43,7 @@
     name: "{{ our_ami_name }}"
     image_id: "{{ our_ami_id }}"
     security_groups: [ "{{ ec2_group_output.security_groups[0].group_id }}" ]
-    assign_public_ip: "{{ c2.asg.public_ip }}"
+    assign_public_ip: "{{ ec2.asg.public_ip }}"
     instance_type: "{{ ec2.instance_type }}"
     volumes:
     - device_name: "/dev/xvda"
