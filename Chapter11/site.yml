@@ -13,25 +13,38 @@
   roles:
     - roles/vpc
     - roles/subnets
-    - roles/gateway
+    # - roles/gateway
     - roles/securitygroups
-    - roles/elb
-    - roles/efs
-    - roles/rds
+    # - roles/elb
+    # - roles/efs
+    # - roles/rds
     - roles/ec2tmp
-    - roles/endpoints
+    # - roles/endpoints
 
-- name: "Install and configure Wordpress"
-  hosts: vmgroup
+# - name: "Install and configure Wordpress"
+#   hosts: vmgroup
+#   gather_facts: true
+#   become: true
+#   become_method: sudo
+
+#   vars_files:
+#     - group_vars/common.yml
+#     - group_vars/generated_aws_endpoints.yml
+
+#   roles:
+#     - roles/stack-install
+#     - roles/stack-config
+#     - roles/wordpress
+
+- name: "Create AMI and update the Auto Scaling Group"
+  hosts: localhost
+  connection: local
   gather_facts: true
-  become: true
-  become_method: sudo
+  vars:
+    state: "present"
 
   vars_files:
     - group_vars/common.yml
-    - group_vars/generated_aws_endpoints.yml
 
   roles:
-    - roles/stack-install
-    - roles/stack-config
-    - roles/wordpress
+    - roles/ec2ami

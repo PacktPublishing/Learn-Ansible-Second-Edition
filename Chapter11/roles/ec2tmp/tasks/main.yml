@@ -52,7 +52,7 @@
 
 - name: "Create the admin ec2 instance"
   amazon.aws.ec2_instance:
-    name: "wibble"
+    name: "{{ ec2_tmp_name }}"
     region: "{{ region }}"
     state: "{{ state }}"
     vpc_subnet_id: "{{ subnet_compute_ids[0] }}"
@@ -63,11 +63,12 @@
       assign_public_ip: "{{ ec2.public_ip }}"
     image_id: "{{ ami.image_id }}"
     tags:
-      Name: "wibble"
+      Name: "{{ ec2_tmp_name }}"
       Description: "{{ dict.ansible_warning }}"
       Project: "{{ app.name }}"
       Environment: "{{ app.env }}"
       Deployed_by: "Ansible"
+      Role: "tmp"
   register: ec2_tmp_instance_output
 
 - name: "Debug: EC2 Instance Output"

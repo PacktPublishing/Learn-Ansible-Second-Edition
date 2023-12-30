@@ -13,6 +13,35 @@
 
   tasks:
 
+    - name: "Get information about the AMIs"
+      amazon.aws.ec2_ami_info:
+        region: "{{ region }}"
+        filters:
+          "tag:projectName": "{{ app.name }}"
+          "tag:environment": "{{ app.env }}"
+          "tag:deployedBy": "{{ playbook_dict.deployedBy }}"
+          "tag:description": "{{ playbook_dict.ansible_warning }}"
+      register: amis_to_delete
+  
+    - name: "Delete the AMI(s)"
+      amazon.aws.ec2_ami:
+        region: "{{ region }}"
+        state: "{{ state }}"
+        image_id: "{{ item.image_id }}"
+        delete_snapshot: true
+      with_items: "{{ amis_to_delete.images }}"
+
+    - name: "Create a SSH Key Pair"
+      amazon.aws.ec2_key:
+        region: "{{ region }}"
+        state: "{{ state }}"
+        name: "{{ ec2.keypair.name }}"
+
+    - name: "Delete the group_vars/generated_aws_endpoints.yml file"
+      file:
+        path: "group_vars/generated_aws_endpoints.yml"
+        state: "{{ state }}"
+
     - name: "Delete the RDS database"
       amazon.aws.rds_instance:
         id: "{{ rds_name }}"
@@ -26,7 +55,7 @@
         region: "{{ region }}"
         state: "{{ state }}"
 
-    - name: "Delete the roup_vars/generated_rds_passwordfile file"
+    - name: "Delete the group_vars/generated_rds_passwordfile file"
       file:
         path: "group_vars/generated_rds_passwordfile"
         state: "{{ state }}"
@@ -37,7 +66,7 @@
         region: "{{ region }}"
         state: "{{ state }}"
 
-    - name: "Delete the roup_vars/generated_efs_targets.yml file"
+    - name: "Delete the group_vars/generated_efs_targets.yml file"
       file:
         path: "group_vars/generated_efs_targets.yml"
         state: "{{ state }}"

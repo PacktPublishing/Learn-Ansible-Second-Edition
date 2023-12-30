@@ -43,6 +43,9 @@ elb_target_group_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb_target
 elb_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb }}"
 efs_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.efs }}"
 rds_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.rds }}"
+ec2_tmp_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
+ami_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ami }}"
+ec2_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
 
 # EC2 Configuration
 ##################################################
@@ -177,6 +180,8 @@ playbook_dict:
   elb: "elb"
   efs: "efs"
   rds: "rds"
+  ec2: "ec2"
+  ami: "ami"
 
 # AWS Configuration, some defaults from other variables
 ##################################################
