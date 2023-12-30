@@ -55,6 +55,7 @@ ec2:
   instance_type: "t2.micro"
   public_ip: true
   asg:
+    public_ip: false
     min_size: 1
     max_size: 3
     desired_capacity: 2
