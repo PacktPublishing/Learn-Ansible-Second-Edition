@@ -20,9 +20,9 @@ php:
         replace: "upload_max_filesize = 20M",
       }
 
-php_fpm_path: "/etc/php/7.4/fpm/pool.d/www.conf"
-php_ini_path: "/etc/php/7.4/fpm/php.ini"
-php_service_name: "php7.4-fpm"
+php_fpm_path: "/etc/php/{{ php_version }}/fpm/pool.d/www.conf"
+php_ini_path: "/etc/php/{{ php_version }}/fpm/php.ini"
+php_service_name: "php{{ php_version }}-fpm"
 
 mariadb:
   bind: "127.0.0.1"

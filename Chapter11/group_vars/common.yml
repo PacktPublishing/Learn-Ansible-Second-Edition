@@ -9,6 +9,12 @@ app:
   region: "eu-west-1" # loction of where the resources are to be created
   env: "prod" # enviroment tag for the app
 
+nfs:
+  mount_point: "/var/www/"
+  mount_options: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2"
+  state: "mounted"
+  fstype: "nfs4"
+
 wp_database:
   name: "{{ rds.db_name }}"
   username: "{{ rds.db_username }}"

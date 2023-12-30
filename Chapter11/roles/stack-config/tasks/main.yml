@@ -1,6 +1,22 @@
 ---
 # tasks file for roles/stack-config
 
+# EFS configuration tasks
+
+- name: "ensure rpcbind service is running"
+  ansible.builtin.service:
+    name: "rpcbind"
+    state: "started"
+    enabled: "yes"
+
+- name: "mount the EFS volume"
+  ansible.posix.mount:
+    src: "{{ aws_endpoints.efs }}:/"
+    path: "{{ nfs.mount_point }}"
+    opts: "{{ nfs.mount_options }}"
+    state: "{{ nfs.state }}"
+    fstype: "{{ nfs.fstype }}"
+
 # WordPress system user tasks
 
 - name: "add the wordpress group"
@@ -16,23 +32,6 @@
     home: "{{ wordpress_system.home }}"
     state: "{{ wordpress_system.state }}"
 
-# EFS configuration tasks
-
-- name: "Mount the EFS volume"
-  ansible.posix.mount:
-    src: "{{ aws_endpoints.efs }}:/"
-    path: "{{ wordpress_system.home }}"
-    opts: "vers=4,minorversion=1,sec=sys"
-    state: "mounted"
-    fstype: "nfs4"
-
-- name: "create the global directory in /etc/nginx/"
-  ansible.builtin.file:
-    dest: "{{ wordpress_system.home }}"
-    name: "{{ wordpress_system.user }}"
-    group: "{{ wordpress_system.group }}"
-    state: "directory"
-    mode: "0755"
 
 # NGINX configuration tasks
 
@@ -67,6 +66,15 @@
   notify: "restart nginx"
 
 # PHP configuration tasks
+
+- name: "Get the PHP version"
+  ansible.builtin.shell:
+    cmd: "php -v | head -n 1 | cut -d ' ' -f 2 | cut -c 1-3"
+  register: php_version_output
+
+- name: "Set the PHP version"
+  set_fact:
+    php_version: "{{ php_version_output.stdout }}"
 
 - name: copy the www.conf to /etc/php-fpm.d/
   ansible.builtin.template:

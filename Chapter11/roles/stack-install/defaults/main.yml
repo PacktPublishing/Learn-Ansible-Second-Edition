@@ -33,3 +33,6 @@ stack_packages:
   - "php-xmlrpc"
   - "php-zip"
   - "nfs-common" # Added for AWS
+  - "nfs4-acl-tools" # Added for AWS
+  - "autofs"  # Added for AWS
+  - "rpcbind"  # Added for AWS
