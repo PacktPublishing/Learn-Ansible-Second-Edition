@@ -46,6 +46,7 @@ rds_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.rds }}"
 ec2_tmp_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
 ami_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ami }}"
 ec2_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
+asg_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.asg }}"
 
 # EC2 Configuration
 ##################################################
@@ -57,6 +58,12 @@ ec2:
     min_size: 1
     max_size: 3
     desired_capacity: 2
+    health_check_type: "EC2"
+    replace_batch_size: 1
+    health_check_period: 300
+    replace_all_instances: true
+    wait_for_instances: true
+    wait_timeout: 900
   ami:
     owners: "099720109477"
     filters:
@@ -182,6 +189,7 @@ playbook_dict:
   rds: "rds"
   ec2: "ec2"
   ami: "ami"
+  asg: "asg"
 
 # AWS Configuration, some defaults from other variables
 ##################################################

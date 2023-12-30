@@ -13,6 +13,25 @@
 
   tasks:
 
+    - name: "Delete the Auto Scaling Group"
+      community.aws.ec2_asg:
+        region: "{{ region }}"
+        state: "{{ state }}"
+        name: "{{ asg_name }}"
+
+    - name: "Get information about the Launch Configuration"
+      community.aws.autoscaling_launch_config_find:
+        region: "{{ region }}"
+        name_regex: "{{ ami_name }}-*"
+      register: the_lcs
+
+    - name: "Delete the Launch Configuration"
+      community.aws.autoscaling_launch_config:
+        region: "{{ region }}"
+        state: "{{ state }}"
+        name: "{{ item.name }}"
+      with_items: "{{ the_lcs.results }}"
+
     - name: "Get information about the AMIs"
       amazon.aws.ec2_ami_info:
         region: "{{ region }}"
