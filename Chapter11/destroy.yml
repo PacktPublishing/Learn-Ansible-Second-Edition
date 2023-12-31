@@ -107,7 +107,7 @@
       with_items: "{{ security_groups_names_reversed }}"
       register: delete_security_groups
       until: "delete_security_groups is not failed"
-      retries: 5
+      retries: 50
       delay: 2
 
     - name: "Get information about the VPC"
