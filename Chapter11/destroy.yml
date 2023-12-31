@@ -19,18 +19,21 @@
         state: "{{ state }}"
         name: "{{ asg_name }}"
 
-    - name: "Get information about the Launch Configuration"
-      community.aws.autoscaling_launch_config_find:
+    - name: "Wait for all instances in the ASG to be terminated"
+      community.aws.ec2_asg_info:
         region: "{{ region }}"
-        name_regex: "{{ ami_name }}-*"
-      register: the_lcs
+        names:
+          - "{{ asg_name }}"
+      register: asg_info
+      until: asg_info.auto_scaling_groups[0].instances | length == 0
+      retries: 30
+      delay: 10
 
-    - name: "Delete the Launch Configuration"
-      community.aws.autoscaling_launch_config:
+    - name: "Delete the Launch Template"
+      community.aws.ec2_launch_template:
         region: "{{ region }}"
         state: "{{ state }}"
-        name: "{{ item.name }}"
-      with_items: "{{ the_lcs.results }}"
+        name: "{{ launch_template_name }}"
 
     - name: "Get information about the AMIs"
       amazon.aws.ec2_ami_info:

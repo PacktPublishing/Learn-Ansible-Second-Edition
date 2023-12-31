@@ -40,18 +40,14 @@
   community.aws.ec2_launch_template:
     region: "{{ region }}"
     state: "{{ state }}"
-    name: "{{ our_ami_name }}"
+    name: "{{ launch_template_name }}"
+    version_description: "{{ our_ami_name }}"
     image_id: "{{ our_ami_id }}"
-    security_groups: [ "{{ ec2_group_output.security_groups[0].group_id }}" ]
-    assign_public_ip: "{{ ec2.asg.public_ip }}"
+    security_group_ids: [ "{{ ec2_group_output.security_groups[0].group_id }}" ]
     instance_type: "{{ ec2.instance_type }}"
-    volumes:
-    - device_name: "/dev/xvda"
-      volume_size: "10"
-      volume_type: "gp2"
-      delete_on_termination: true
+    disable_api_termination: "{{ ec2.asg.disable_api_termination }}"
     tags:
-      "Name": "{{ our_ami_name }}"
+      "Name": "{{ ec2_name }}"
       "projectName": "{{ app.name }}"
       "environment": "{{ app.env }}"
       "deployedBy": "{{ playbook_dict.deployedBy }}"
@@ -98,7 +94,8 @@
     state: "{{ state }}"
     name: "{{ asg_name }}"
     target_group_arns: [ "{{ elb_target_group_output.target_groups[0].target_group_arn }}" ]
-    launch_config_name: "{{ our_ami_name }}"
+    launch_template:
+      launch_template_name: "{{ launch_template_name }}"
     min_size: "{{ ec2.asg.min_size }}"
     max_size: "{{ ec2.asg.max_size }}"
     desired_capacity: "{{ ec2.asg.desired_capacity }}"

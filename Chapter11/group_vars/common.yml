@@ -43,9 +43,10 @@ elb_target_group_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb_target
 elb_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb }}"
 efs_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.efs }}"
 rds_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.rds }}"
-ec2_tmp_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
+ec2_tmp_name: "{{ app.name }}-tmp-{{ playbook_dict.ec2 }}"
 ami_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ami }}"
 ec2_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
+launch_template_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.lt }}"
 asg_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.asg }}"
 
 # EC2 Configuration
@@ -65,6 +66,7 @@ ec2:
     replace_all_instances: true
     wait_for_instances: true
     wait_timeout: 900
+    disable_api_termination: true
   ami:
     owners: "099720109477"
     filters:
@@ -191,6 +193,7 @@ playbook_dict:
   ec2: "ec2"
   ami: "ami"
   asg: "asg"
+  lt: "launch-template"
 
 # AWS Configuration, some defaults from other variables
 ##################################################
