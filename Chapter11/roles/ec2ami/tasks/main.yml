@@ -42,6 +42,9 @@
     name: "{{ ec2_tmp_name }}"
     filters:
       instance-state-name: "running"
+      "tag:Name": "{{ ec2_tmp_name }}"
+      "tag:Role": "tmp"
+      "tag:Project": "{{ app.name }}"
 
 - name: "wait for 2 minutes before continuing"
   ansible.builtin.pause:

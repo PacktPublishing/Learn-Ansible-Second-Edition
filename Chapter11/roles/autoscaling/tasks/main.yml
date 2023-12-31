@@ -36,8 +36,8 @@
     var: ec2_group_output
   when: debug_output
 
-- name: "create the launch configuration"
-  community.aws.autoscaling_launch_config:
+- name: "create the launch template"
+  community.aws.ec2_launch_template:
     region: "{{ region }}"
     state: "{{ state }}"
     name: "{{ our_ami_name }}"
@@ -50,6 +50,13 @@
       volume_size: "10"
       volume_type: "gp2"
       delete_on_termination: true
+    tags:
+      "Name": "{{ our_ami_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "launchTemplate"      
 
 - name: "find out the target group ARN"
   elb_target_group_info:
@@ -86,7 +93,7 @@
   when: debug_output
 
 - name: create / update the auto-scaling group using the launch configuration we just created
-  community.aws.ec2_asg:
+  amazon.aws.autoscaling_group:
     region: "{{ region }}"
     state: "{{ state }}"
     name: "{{ asg_name }}"
@@ -104,7 +111,7 @@
     wait_timeout: "{{ ec2.asg.wait_timeout }}"
     tags:
       - key: "Name"
-        value: "{{ asg_name }}"
+        value: "{{ ec2_name }}"
         propagate_at_launch: true
       - key: "Project"
         value: "{{ app.name }}"
