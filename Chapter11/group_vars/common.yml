@@ -77,8 +77,8 @@ asg_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.asg }}"
 ec2:
   instance_type: "t2.micro"
   public_ip: true
+  ssh_port: "22"
   asg:
-    public_ip: false
     min_size: 1
     max_size: 3
     desired_capacity: 2
@@ -97,7 +97,6 @@ ec2:
   keypair:
     name: "ssh_keypair"
     key_material: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-  ssh_port: "22"
 
 # RDS Configuration
 ##################################################
@@ -110,6 +109,13 @@ rds:
   engine: "mysql"
   engine_version: "8.0"
   allocated_storage: "5"
+
+# EFS Configuration
+##################################################
+
+efs:
+  wait: "yes"
+  wait_time: "1200"
 
 # VPC and Subnets Configuration
 ##################################################
@@ -189,13 +195,6 @@ elb_seach_string: "elb"
 ec2_seach_string: "ec2"
 rds_seach_string: "rds"
 efs_seach_string: "efs"
-
-# EFS Configuration
-##################################################
-
-efs:
-  wait: "yes"
-  wait_time: "1200"
 
 # Dictionary
 ##################################################
