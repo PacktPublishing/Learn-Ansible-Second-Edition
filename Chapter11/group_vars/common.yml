@@ -9,12 +9,6 @@ app:
   region: "eu-west-1" # loction of where the resources are to be created
   env: "prod" # enviroment tag for the app
 
-nfs:
-  mount_point: "/var/www/"
-  mount_options: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2"
-  state: "mounted"
-  fstype: "nfs4"
-
 wp_database:
   name: "{{ rds.db_name }}"
   username: "{{ rds.db_username }}"
@@ -32,6 +26,34 @@ wordpress:
     - "wordpress-seo"
     - "wordfence"
     - "nginx-helper"
+
+# Stack Configuration
+##################################################
+
+stack_packages:
+  - "nginx"
+  - "mariadb-client"
+  - "php-cli"
+  - "php-curl"
+  - "php-fpm"
+  - "php-gd"
+  - "php-intl"
+  - "php-mbstring"
+  - "php-mysql"
+  - "php-soap"
+  - "php-xml"
+  - "php-xmlrpc"
+  - "php-zip"
+  - "nfs-common" # Added for AWS
+  - "nfs4-acl-tools" # Added for AWS
+  - "autofs"  # Added for AWS
+  - "rpcbind"  # Added for AWS
+
+nfs:
+  mount_point: "/var/www/"
+  mount_options: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2"
+  state: "mounted"
+  fstype: "nfs4"
 
 # Resource Names
 ##################################################
