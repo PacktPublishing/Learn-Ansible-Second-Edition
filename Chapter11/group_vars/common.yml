@@ -2,12 +2,12 @@
 # Application and Resource Configuration
 ##################################################
 
-debug_output: true
+debug_output: false
 
 app:
-  name: "learnansible" # don't get too creative
-  region: "eu-west-1" # loction of where the resources are to be created
-  env: "prod" # enviroment tag for the app
+  name: "learnansible"
+  region: "eu-west-1"
+  env: "prod"
 
 wp_database:
   name: "{{ rds.db_name }}"
