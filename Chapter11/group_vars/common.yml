@@ -137,11 +137,6 @@ subnet_role_public: "public"
 # Security Group Configuration
 ##################################################
 
-elb_seach_string: "elb"
-ec2_seach_string: "ec2"
-rds_seach_string: "rds"
-efs_seach_string: "efs"
-
 security_groups:
   - name: "{{ app.name  }}-{{ elb_seach_string }}-{{ playbook_dict.security_group }}"
     description: "opens port 80 and 443 to the world"
@@ -189,6 +184,11 @@ security_groups:
         to_port: "2049"
         group_id: "{{ ec2_group_id | default('') }}"
         rule_desc: "allow {{ ec2_group_id | default('') }} access to port 2049"
+
+elb_seach_string: "elb"
+ec2_seach_string: "ec2"
+rds_seach_string: "rds"
+efs_seach_string: "efs"
 
 # EFS Configuration
 ##################################################
