@@ -33,7 +33,7 @@
     var: rds_group_id
   when: debug_output
 
-- name: Create the RDS database
+- name: "Create the RDS instance"
   amazon.aws.rds_instance:
     id: "{{ rds_name }}"
     region: "{{ region }}"
