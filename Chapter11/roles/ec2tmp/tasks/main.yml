@@ -1,7 +1,7 @@
 ---
 # tasks file for roles/ec2tmp
 
-- name: gather information about AMIs with the specified filters
+- name: "Gather information about AMIs with the specified filters"
   amazon.aws.ec2_ami_info:
     region: "{{ region }}"
     owners: "{{ ec2.ami.owners }}"

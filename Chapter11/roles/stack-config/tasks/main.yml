@@ -3,7 +3,7 @@
 
 # EFS configuration tasks
 
-- name: "Wait for the EFS volume to be ready"
+- name: "Check that the EFS volume is ready"
   ansible.builtin.wait_for:
     host: "{{ aws_endpoints.efs }}"
     port: "2049"
