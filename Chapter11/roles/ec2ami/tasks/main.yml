@@ -35,7 +35,7 @@
     var: "ami_output"
   when: debug_output
 
-- name: "remove any tmp instances which are running"
+- name: "remove any temporary  instances which are running"
   amazon.aws.ec2_instance:
     region: "{{ region }}"
     state: "absent"

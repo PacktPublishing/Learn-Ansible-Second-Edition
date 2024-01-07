@@ -1,18 +1,18 @@
 ---
 # tasks file for roles/autoscaling
 
-- name: search through all of our AMIs
+- name: "Search for all of our AMIs"
   amazon.aws.ec2_ami_info:
     region: "{{ region }}"
     filters:
       name: "{{ ami_name }}-*"
   register: amiFind
 
-- name: "find the last one we built"
+- name: "Find the last one we built"
   ansible.builtin.set_fact:
     amiSortFilter: "{{ amiFind.images | sort(attribute='creation_date') | last }}"
 
-- name: "grab AMI ID and name of the most recent result"
+- name: "Grab AMI ID and name of the most recent result"
   ansible.builtin.set_fact:
     our_ami_id: "{{ amiSortFilter.image_id }}"
     our_ami_name: "{{ amiSortFilter.name }}"
@@ -29,11 +29,11 @@
     region: "{{ region }}"
     filters:
       group-name: "*{{ ec2_seach_string }}*"
-  register: ec2_group_output
+  register: ec2_group_id
 
 - name: "Debug: EC2 Security Group Info"
   ansible.builtin.debug:
-    var: ec2_group_output
+    var: ec2_group_id
   when: debug_output
 
 - name: "create the launch template"
@@ -43,7 +43,7 @@
     name: "{{ launch_template_name }}"
     version_description: "{{ our_ami_name }}"
     image_id: "{{ our_ami_id }}"
-    security_group_ids: [ "{{ ec2_group_output.security_groups[0].group_id }}" ]
+    security_group_ids: [ "{{ ec2_group_id.security_groups[0].group_id }}" ]
     instance_type: "{{ ec2.instance_type }}"
     disable_api_termination: "{{ ec2.asg.disable_api_termination }}"
     tags:
