@@ -20,6 +20,7 @@ extra_packages:
 
 stack_packages:
   - "nginx"
+  - "mariadb-server"
   - "mariadb-client"
   - "php-cli"
   - "php-curl"
@@ -32,7 +33,3 @@ stack_packages:
   - "php-xml"
   - "php-xmlrpc"
   - "php-zip"
-  - "nfs-common" # Added for AWS
-  - "nfs4-acl-tools" # Added for AWS
-  - "autofs"  # Added for AWS
-  - "rpcbind"  # Added for AWS
