@@ -119,10 +119,10 @@
 #     state: "started"
 #     enabled: "yes"
 
-- name: "check to see if the ~/.my.cnf file exists"
-  ansible.builtin.stat:
-    path: "~/.my.cnf"
-  register: mycnf
+# - name: "check to see if the ~/.my.cnf file exists"
+#   ansible.builtin.stat:
+#     path: "~/.my.cnf"
+#   register: mycnf
 
 # - name: "change mysql root password if we need to"
 #   ansible.builtin.mysql_user:
