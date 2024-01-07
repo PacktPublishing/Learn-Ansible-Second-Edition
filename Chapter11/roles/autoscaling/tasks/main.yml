@@ -36,7 +36,7 @@
     var: ec2_group_id
   when: debug_output
 
-- name: "create the launch template"
+- name: "Create the launch template"
   community.aws.ec2_launch_template:
     region: "{{ region }}"
     state: "{{ state }}"
@@ -88,7 +88,7 @@
     var: subnet_ec2_ids
   when: debug_output
 
-- name: create / update the auto-scaling group using the launch configuration we just created
+- name: "Create/update the auto-scaling group using the launch template we just created"
   amazon.aws.autoscaling_group:
     region: "{{ region }}"
     state: "{{ state }}"
