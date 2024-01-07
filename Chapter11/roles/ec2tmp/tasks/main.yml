@@ -50,7 +50,7 @@
     var: ec2_group_id
   when: debug_output
 
-- name: "Create the tempoary ec2 instance"
+- name: "Create the temporary ec2 instance"
   amazon.aws.ec2_instance:
     name: "{{ ec2_tmp_name }}"
     region: "{{ region }}"
@@ -76,7 +76,7 @@
     var: ec2_tmp_instance_output
   when: debug_output
 
-- name: "Get information about the tempoary EC2 instance to see if its running"
+- name: "Get information about the temporary EC2 instance to see if it is running"
   amazon.aws.ec2_instance_info:
     region: "{{ region }}"
     filters:
@@ -86,13 +86,13 @@
   retries: 50
   until: ec2_tmp_instance_state.instances[0].state.name == "running"
 
-- name: "Add the tempoary EC2 instance to the vmgroup"
+- name: "Add the temporary EC2 instance to the vmgroup"
   ansible.builtin.add_host:
     name: "{{ ec2_tmp_instance_output.instances[0].public_dns_name }}"
     ansible_ssh_host: "{{ ec2_tmp_instance_output.instances[0].public_ip_address }}"
     groups: "vmgroup"
 
-- name: "Wait for the tempoary EC2 instance to be ready to accept SSH connections"
+- name: "Wait for the temporary EC2 instance to be ready to accept SSH connections"
   ansible.builtin.wait_for:
     host: "{{ ec2_tmp_instance_output.instances[0].public_ip_address }}"
     port: "{{ ec2.ssh_port }}"

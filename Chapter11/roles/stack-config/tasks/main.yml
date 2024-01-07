@@ -3,6 +3,13 @@
 
 # EFS configuration tasks
 
+- name: "Wait for the EFS volume to be ready"
+  ansible.builtin.wait_for:
+    host: "{{ aws_endpoints.efs }}"
+    port: "2049"
+    delay: 10
+    timeout: 300
+
 - name: "ensure rpcbind service is running"
   ansible.builtin.service:
     name: "rpcbind"
