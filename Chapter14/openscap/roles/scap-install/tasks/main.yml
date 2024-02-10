@@ -19,7 +19,7 @@
 
 - name: "download the latest scap security guide content"
   ansible.builtin.unarchive:
-    src: "{{ openscap_download.url }}"
+    src: "{{ lookup('url', '{{ openscap_download.openscap_github_release_api_url }}', split_lines=false) | from_json | json_query('assets[?content_type==`application/zip`].browser_download_url') | last }}"
     dest: "{{ openscap_download.dest }}"
     creates: "{{ openscap_download.dest }}/README.md"
     list_files: true
