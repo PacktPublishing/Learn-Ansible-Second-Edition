@@ -1,3 +1,71 @@
 ---
 # tasks file for roles/scap-scan
 
+- name: "get information of the SCAP profiles available for the target system"
+  ansible.builtin.command: "oscap info --profiles --fetch-remote-resources {{ scan.ssg_file_name }}"
+  register: scap_info
+
+- name: "Debug: SCAP profiles available for the target system" 
+  ansible.builtin.debug:
+    var: scap_info.stdout_lines
+  when: debug
+
+- name: "extract profile name based on our selection criteria"
+  ansible.builtin.set_fact:
+    profile_name: "{{ scap_info.stdout_lines | select('search', scan.profile_search) | map('regex_replace', '^(.*?):.*$', '\\1') | first }}"
+
+- name: "Debug: profile name"
+  ansible.builtin.debug:
+    var: profile_name
+  when: debug
+
+- name: "Run SCAP scan"
+  ansible.builtin.command: "oscap xccdf eval --profile {{ profile_name }} --results-arf {{ scan.output_dir }}{{ scan.output_file_xml }} --report {{ scan.output_dir }}{{ scan.output_file_html }} {{ scan.ssg_file_name }}"
+  ignore_errors: true
+  register: scap_scan
+
+- name: "set a fact to lock in the date and time of the scan for the output folder name"
+  ansible.builtin.set_fact:
+    scan_local_output_folder: "{{ scan.local_output_dir }}"
+
+- name: "ensure the local output directory exists"
+  ansible.builtin.file:
+    path: "{{ scan.local_output_dir }}"
+    state: directory
+  delegate_to: "localhost"
+  become: false
+
+- name: "copy the SCAP repoort and results file to local machine"
+  ansible.builtin.fetch:
+    src: "{{ item }}"
+    dest: "{{ scan_local_output_folder }}/"
+    flat: true
+  with_items: 
+    - "{{ scan.output_dir }}{{ scan.output_file_xml }}"
+    - "{{ scan.output_dir }}{{ scan.output_file_html }}"
+
+- name: "Generate SCAP guide"
+  ansible.builtin.command: "oscap xccdf generate guide --profile {{ profile_name }} {{ scan.ssg_file_name }}"
+  ignore_errors: true
+  register: scap_guide
+
+- name: "copy SCAP guide to local machine"
+  copy:
+    content: "{{ scap_guide.stdout }}"
+    dest: "{{ scan_local_output_folder }}/{{ scan.output_file_guide }}"
+  when: scap_guide is defined
+  delegate_to: "localhost"
+  become: false
+
+- name: "Generate SCAP fix playbook"
+  ansible.builtin.command: "oscap xccdf generate fix --fetch-remote-resources --fix-type ansible --result-id '' {{ scan.output_dir }}{{ scan.output_file_xml }}"
+  ignore_errors: true
+  register: scap_playbook
+
+- name: "copy SCAP playbook to local machine"
+  copy:
+    content: "{{ scap_playbook.stdout }}"
+    dest: "{{ scan_local_output_folder }}/{{ scan.output_file_playbook }}"
+  when: scap_playbook is defined
+  delegate_to: "localhost"
+  become: false
