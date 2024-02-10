@@ -69,3 +69,4 @@
   when: scap_playbook is defined
   delegate_to: "localhost"
   become: false
+  notify: "Print the remediation playbook command to run"

@@ -1,0 +1,12 @@
+---
+# defaults file for roles/openscap-clean
+
+target_directory: "/tmp/scap-security-guide/"
+file_types:
+  - "*.sh"
+  - "*.html"
+  - "*.xml"
+  - "*.txt"
+  - "*.json"
+  - "*.yml"
+  - "*.cfg"

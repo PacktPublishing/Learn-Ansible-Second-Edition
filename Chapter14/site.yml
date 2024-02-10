@@ -1,0 +1,17 @@
+---
+- hosts: ansible_hosts
+  gather_facts: true
+  become: true
+  become_method: sudo
+  vars_files:
+    - "group_vars/common.yml" 
+
+  roles:
+    - { role: "openscap-install", tags: [ "openscap" ] }
+    - { role: "openscap-clean", tags: [ "openscap" ] }
+    - { role: "openscap-scan", tags: [ "openscap" ] }
+    - { role: "../Chapter05/roles/stack-install", tags: [ "wordpress" ] }
+    - { role: "../Chapter05/roles/stack-config", tags: [ "wordpress" ] }
+    - { role: "../Chapter05/roles/wordpress", tags: [ "wordpress" ] }
+
+      
