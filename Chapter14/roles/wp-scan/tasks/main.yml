@@ -1,0 +1,29 @@
+---
+# tasks file for roles/wp-scan
+
+- name: "pull the image"
+  community.docker.docker_image:
+    name: "{{ image }}"
+    source: pull
+
+- name: create the folder which we will mount inside the container
+  file:
+    path: "{{ log.remote_folder }}"
+    state: "directory"
+    mode: "0777"
+
+- name: "run the scan"
+  community.docker.docker_container:
+    detach: false
+    auto_remove: false
+    name: "wpscan"
+    volumes: "{{ log.remote_folder }}:{{ log.remote_folder }}"
+    image: "{{ image }}"
+    command: "--url http://{{ ansible_host }} --enumerate u --plugins-detection mixed --format cli-no-color --output {{ log.remote_folder }}{{ log.file }}"
+  register: docker_scan
+
+- name: "download the report"
+  ansible.builtin.fetch:
+    src: "{{ log.remote_folder }}{{ log.file }}"
+    dest: "{{ log.local_folder }}"
+    flat: yes

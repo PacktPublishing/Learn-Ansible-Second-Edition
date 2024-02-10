@@ -4,14 +4,15 @@
   become: true
   become_method: sudo
   vars_files:
-    - "group_vars/common.yml" 
+    - 'group_vars/common.yml'
 
   roles:
-    - { role: "openscap-install", tags: [ "openscap" ] }
-    - { role: "openscap-clean", tags: [ "openscap" ] }
-    - { role: "openscap-scan", tags: [ "openscap" ] }
-    - { role: "../Chapter05/roles/stack-install", tags: [ "wordpress" ] }
-    - { role: "../Chapter05/roles/stack-config", tags: [ "wordpress" ] }
-    - { role: "../Chapter05/roles/wordpress", tags: [ "wordpress" ] }
-
-      
+    - { role: 'openscap-install', tags: ['openscap'] }
+    - { role: 'openscap-clean', tags: ['openscap'] }
+    - { role: 'openscap-scan', tags: ['openscap'] }
+    - { role: 'docker', tags: ['wordpress','wp-scan','zap'] }
+    - { role: '../Chapter05/roles/stack-install', tags: ['wordpress'] }
+    - { role: '../Chapter05/roles/stack-config', tags: ['wordpress'] }
+    - { role: '../Chapter05/roles/wordpress', tags: ['wordpress'] }
+    - { role: 'wp-scan', tags: ['wordpress','wp-scan'] }
+    - { role: 'zap', tags: ['wordpress','zap'] }

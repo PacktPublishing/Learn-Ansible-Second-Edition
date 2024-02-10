@@ -1,0 +1,8 @@
+---
+# defaults file for roles/wp-scan
+
+image: "wpscanteam/wpscan"
+log:
+  remote_folder: /tmp/wpscan/
+  local_folder: "output/"
+  file: "{{ the_date }}-wp-scan-results.txt"

@@ -1,0 +1,8 @@
+---
+# defaults file for roles/zap
+
+image: "ghcr.io/zaproxy/zaproxy:stable"
+log:
+  remote_folder: /tmp/zap/
+  local_folder: "output/"
+  file: "{{ the_date }}-zap-resaults.html"

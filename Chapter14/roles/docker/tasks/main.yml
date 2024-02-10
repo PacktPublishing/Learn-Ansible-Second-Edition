@@ -1,0 +1,30 @@
+---
+# tasks file for roles/docker
+
+- name: "install prerequisites for Docker"
+  ansible.builtin.apt:
+    name: "{{ docker.prerequisites }}"
+    state: "present"
+    update_cache: true
+
+- name: "add Docker's official GPG key"
+  ansible.builtin.apt_key:
+    url: "{{ docker.gpg_key }}"
+    state: "present"
+
+- name: "add Docker repository"
+  ansible.builtin.apt_repository:
+    repo: "{{ docker.repo}}"
+    state: "present"
+
+- name: "install Docker packages"
+  ansible.builtin.apt:
+    name: "{{ docker.packages }}"
+    state: "present"
+    update_cache: true
+
+- name: "ensure Docker service is running"
+  ansible.builtin.service:
+    name: "docker"
+    state: "started"
+    enabled: true
