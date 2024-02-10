@@ -1,0 +1,10 @@
+ansiblevm ansible_host=paste_your_ip_here.nip.io
+
+[ansible_hosts]
+ansiblevm
+
+[ansible_hosts:vars]
+ansible_connection=ssh
+ansible_user=vmadmin
+ansible_private_key_file=./example_key
+host_key_checking=False

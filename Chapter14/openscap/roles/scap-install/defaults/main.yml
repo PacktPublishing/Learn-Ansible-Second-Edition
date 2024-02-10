@@ -1,0 +1,13 @@
+---
+# defaults file for roles/scap-install
+
+scap_packages:
+  - "unzip"
+  - "curl"
+  - "libopenscap8"
+
+openscap_github_release_api_url: "https://api.github.com/repos/ComplianceAsCode/content/releases/latest"
+
+openscap_download:
+  url: "{{ lookup('url', '{{ openscap_github_release_api_url }}', split_lines=false) | from_json | json_query('assets[?content_type==`application/zip`].browser_download_url') | last }}"
+  dest: "/tmp/scap-security-guide"
