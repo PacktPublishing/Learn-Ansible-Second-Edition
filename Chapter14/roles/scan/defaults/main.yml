@@ -24,7 +24,7 @@ scan:
     container_folder: "/tmp/{{ common_scan_settings.dict.wpscan }}/"
     command: "--url http://{{ ansible_host }} --enumerate u --plugins-detection mixed --format cli-no-color --output /tmp/{{ common_scan_settings.dict.wpscan }}/{{ common_scan_settings.report_name }}{{ common_scan_settings.dict.wpscan }}.txt"
     log:
-      remote_folder: "/tmp/{{ dict.wpscan }}/"
+      remote_folder: "/tmp/{{ common_scan_settings.dict.wpscan }}/"
       local_folder: "{{ common_scan_settings.local_folder }}"
       file: "{{ common_scan_settings.report_name }}{{ common_scan_settings.dict.wpscan }}.txt"
   - name: "zap"

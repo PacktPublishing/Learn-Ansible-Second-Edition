@@ -7,9 +7,10 @@
     - 'group_vars/common.yml'
 
   roles:
-    - { role: 'openscap', tags: ['openscap'] }
+    - { role: 'common', tags: ['openscap','scan'] }
     - { role: 'docker', tags: ['docker','scan'] }
     - { role: '../Chapter05/roles/stack-install', tags: ['wordpress'] }
     - { role: '../Chapter05/roles/stack-config', tags: ['wordpress'] }
     - { role: '../Chapter05/roles/wordpress', tags: ['wordpress'] }
     - { role: 'scan', tags: ['scan'] }
+    - { role: 'openscap', tags: ['openscap'] }
