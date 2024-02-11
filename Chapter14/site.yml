@@ -10,9 +10,8 @@
     - { role: 'openscap-install', tags: ['openscap'] }
     - { role: 'openscap-clean', tags: ['openscap'] }
     - { role: 'openscap-scan', tags: ['openscap'] }
-    - { role: 'docker', tags: ['wordpress','wp-scan','zap'] }
+    - { role: 'docker', tags: ['docker','scan'] }
     - { role: '../Chapter05/roles/stack-install', tags: ['wordpress'] }
     - { role: '../Chapter05/roles/stack-config', tags: ['wordpress'] }
     - { role: '../Chapter05/roles/wordpress', tags: ['wordpress'] }
-    - { role: 'wp-scan', tags: ['wordpress','wp-scan'] }
-    - { role: 'zap', tags: ['wordpress','zap'] }
+    - { role: 'scan', tags: ['scan'] }

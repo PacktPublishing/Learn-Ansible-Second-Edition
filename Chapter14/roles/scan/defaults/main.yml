@@ -1,0 +1,36 @@
+---
+# defaults file for roles/scan
+
+scan_types:
+  - "wpscan"
+  - "zap"
+
+common_scan_settings:
+  detach: false
+  auto_remove: false
+  source: "pull"
+  local_folder: "output/"
+
+scan:
+  - name: "wpscan"
+    image: "wpscanteam/wpscan:latest"
+    source: "{{ common_scan_settings.source }}"
+    detach: "{{ common_scan_settings.detach }}"
+    auto_remove: "{{ common_scan_settings.auto_remove }}"
+    container_folder: "/tmp/wpscan/"
+    command: "--url http://{{ ansible_host }} --enumerate u --plugins-detection mixed --format cli-no-color --output /tmp/wpscan/{{ the_date }}-wpscan-results.txt"
+    log:
+      remote_folder: "/tmp/wpscan/"
+      local_folder: "{{ common_scan_settings.local_folder }}"
+      file: "{{ the_date }}-wpscan-results.txt"
+  - name: "zap"
+    image: "ghcr.io/zaproxy/zaproxy:stable"
+    source: "{{ common_scan_settings.source }}"
+    detach: "{{ common_scan_settings.detach }}"
+    auto_remove: "{{ common_scan_settings.auto_remove }}"
+    container_folder: "/zap/wrk/"
+    command: "zap-baseline.py -t http://{{ ansible_host }} -g gen.conf -r {{ the_date }}-zap-results.html"
+    log:
+      remote_folder: "/tmp/zap/"
+      local_folder: "{{ common_scan_settings.local_folder }}"
+      file: "{{ the_date }}-zap-results.html"
