@@ -1,8 +1,0 @@
----
-# handlers file for roles/scap-scan
-
-- name: "Print the remediation playbook command to run"
-  ansible.builtin.debug:
-    msg:
-      - "To run the remediation playbook, use the following command:" 
-      - "ansible-playbook -i hosts --become -become-method=sudo {{ scan_local_output_folder }}/{{ scan.output_file_playbook }}"

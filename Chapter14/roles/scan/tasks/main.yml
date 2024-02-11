@@ -36,6 +36,11 @@
   loop_control:
     label: "{{ item.name }}"
 
+- name: "Debug: docker_scan"
+  ansible.builtin.debug:
+    var: docker_scan
+  when: debug
+
 - name: "download the report"
   ansible.builtin.fetch:
     src: "{{ item.log.remote_folder }}{{ item.log.file }}"

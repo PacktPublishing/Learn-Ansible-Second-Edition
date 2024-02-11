@@ -1,0 +1,8 @@
+---
+# handlers file for roles/openscap
+
+- name: "Print the remediation playbook command to run"
+  ansible.builtin.debug:
+    msg:
+      - "To run the remediation playbook, use the following command:" 
+      - "ansible-playbook -i hosts --become -become-method=sudo {{ scan_local_output_folder }}/{{ openscap_scan.output_file_playbook }}"

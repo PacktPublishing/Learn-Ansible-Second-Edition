@@ -1,0 +1,156 @@
+---
+# tasks file for roles/openscap
+
+- name: "update apt cache and upgrade packages"
+  ansible.builtin.apt:
+    name: "*"
+    state: "latest"
+    update_cache: "yes"
+
+- name: "install common packages"
+  ansible.builtin.apt:
+    state: "latest"
+    pkg: "{{ scap_packages }}"
+
+- name: "create the directory to store the scap security guide content"
+  ansible.builtin.file:
+    path: "{{ openscap_download.dest }}"
+    state: "directory"
+
+- name: "download the latest scap security guide content"
+  ansible.builtin.unarchive:
+    src: "{{ lookup('url', '{{ openscap_download.openscap_github_release_api_url }}', split_lines=false) | from_json | json_query('assets[?content_type==`application/zip`].browser_download_url') | last }}"
+    dest: "{{ openscap_download.dest }}"
+    creates: "{{ openscap_download.dest }}/README.md"
+    list_files: true
+    remote_src: true
+  register: scap_download_result
+
+- name: "Debug: scap download result"
+  ansible.builtin.debug:
+    var: scap_download_result
+  when: debug 
+
+- name: "move scap security guide content to the correct location"
+  ansible.builtin.shell: "mv {{ openscap_download.dest }}/{{ scap_download_result.files[0] }}/* {{ openscap_download.dest }}"
+  when: scap_download_result.changed
+
+- name: "remove the downloaded scap security guide content"
+  ansible.builtin.file:
+    path: "{{ openscap_download.dest }}/{{ scap_download_result.files[0] }}"
+    state: "absent"
+  when: scap_download_result.changed
+
+- name: "find files that do not contain {{ ansible_facts.distribution | lower }}{{ ansible_facts.distribution_version | replace('.','') }} in the specified types"
+  find:
+    paths: "{{ openscap_download.dest }}"
+    patterns: "{{ openscap_download.file_types_to_clean_up }}"
+    recurse: yes
+    excludes: "*{{ ansible_facts.distribution | lower }}{{ ansible_facts.distribution_version | replace('.','') }}*"
+  register: files_to_delete
+  when: scap_options.clean
+
+- name: "Debug: files to delete"
+  ansible.builtin.debug:
+    var: files_to_delete.files
+  when: debug
+
+- name: Remove the files that do not match the pattern
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ files_to_delete.files }}"
+  when:
+    - scap_options.clean
+    - files_to_delete.files is defined
+
+- name: "get information of the SCAP profiles available for the target system"
+  ansible.builtin.command: "oscap info --profiles --fetch-remote-resources {{ openscap_scan.ssg_file_name }}"
+  register: scap_info
+
+- name: "Debug: SCAP profiles available for the target system" 
+  ansible.builtin.debug:
+    var: scap_info.stdout_lines
+  when: debug
+
+- name: "extract profile name based on our selection criteria"
+  ansible.builtin.set_fact:
+    profile_name: "{{ scap_info.stdout_lines | select('search', openscap_scan.profile_search) | map('regex_replace', '^(.*?):.*$', '\\1') | first }}"
+
+- name: "Debug: profile name"
+  ansible.builtin.debug:
+    var: profile_name
+  when: debug
+
+- name: "Run SCAP scan"
+  ansible.builtin.command: "oscap xccdf eval --profile {{ profile_name }} --results-arf {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }} --report {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_html }} {{ openscap_scan.ssg_file_name }}"
+  ignore_errors: true
+  no_log: true
+  register: scap_scan
+
+- name: "Debug: SCAP scan"
+  ansible.builtin.debug:
+    var: scap_scan
+  when: debug
+
+- name: "set a fact to lock in the date and time of the scan for the output folder name"
+  ansible.builtin.set_fact:
+    scan_local_output_folder: "{{ openscap_scan.local_output_dir }}"
+
+- name: "Debug: local output folder"
+  ansible.builtin.debug:
+    var: scan_local_output_folder
+  when: debug
+
+- name: "ensure the local output directory exists"
+  ansible.builtin.file:
+    path: "{{ openscap_scan.local_output_dir }}"
+    state: directory
+  delegate_to: "localhost"
+  become: false
+
+- name: "copy the SCAP repoort and results file to local machine"
+  ansible.builtin.fetch:
+    src: "{{ item }}"
+    dest: "{{ scan_local_output_folder }}/"
+    flat: true
+  with_items: 
+    - "{{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }}"
+    - "{{ openscap_scan.output_dir }}{{ openscap_scan.output_file_html }}"
+
+- name: "generate SCAP guide"
+  ansible.builtin.command: "oscap xccdf generate guide --profile {{ profile_name }} {{ openscap_scan.ssg_file_name }}"
+  ignore_errors: true
+  register: scap_guide
+
+- name: "Debug: SCAP guide"
+  ansible.builtin.debug:
+    var: scap_guide
+  when: debug
+
+- name: "copy SCAP guide to local machine"
+  copy:
+    content: "{{ scap_guide.stdout }}"
+    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_guide }}"
+  when: scap_guide is defined
+  delegate_to: "localhost"
+  become: false
+
+- name: "generate SCAP fix playbook"
+  ansible.builtin.command: "oscap xccdf generate fix --fetch-remote-resources --fix-type ansible --result-id '' {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }}"
+  ignore_errors: true
+  register: scap_playbook
+
+- name: "Debug: SCAP fix playbook"
+  ansible.builtin.debug:
+    var: scap_playbook
+  when: debug
+
+- name: "copy SCAP playbook to local machine"
+  copy:
+    content: "{{ scap_playbook.stdout }}"
+    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_playbook }}"
+  when: scap_playbook is defined
+  delegate_to: "localhost"
+  become: false
+  notify: "Print the remediation playbook command to run"
