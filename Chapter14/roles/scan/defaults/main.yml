@@ -10,6 +10,10 @@ common_scan_settings:
   auto_remove: false
   source: "pull"
   local_folder: "output/"
+  report_name: "{{ the_date }}-results-"
+  dict:
+    wpscan: "wpscan"
+    zap: "zap"
 
 scan:
   - name: "wpscan"
@@ -17,20 +21,20 @@ scan:
     source: "{{ common_scan_settings.source }}"
     detach: "{{ common_scan_settings.detach }}"
     auto_remove: "{{ common_scan_settings.auto_remove }}"
-    container_folder: "/tmp/wpscan/"
-    command: "--url http://{{ ansible_host }} --enumerate u --plugins-detection mixed --format cli-no-color --output /tmp/wpscan/{{ the_date }}-wpscan-results.txt"
+    container_folder: "/tmp/{{ common_scan_settings.dict.wpscan }}/"
+    command: "--url http://{{ ansible_host }} --enumerate u --plugins-detection mixed --format cli-no-color --output /tmp/{{ common_scan_settings.dict.wpscan }}/{{ common_scan_settings.report_name }}{{ common_scan_settings.dict.wpscan }}.txt"
     log:
-      remote_folder: "/tmp/wpscan/"
+      remote_folder: "/tmp/{{ dict.wpscan }}/"
       local_folder: "{{ common_scan_settings.local_folder }}"
-      file: "{{ the_date }}-wpscan-results.txt"
+      file: "{{ common_scan_settings.dict.report_name }}{{ common_scan_settings.dict.wpscan }}.txt"
   - name: "zap"
     image: "ghcr.io/zaproxy/zaproxy:stable"
     source: "{{ common_scan_settings.source }}"
     detach: "{{ common_scan_settings.detach }}"
     auto_remove: "{{ common_scan_settings.auto_remove }}"
     container_folder: "/zap/wrk/"
-    command: "zap-baseline.py -t http://{{ ansible_host }} -g gen.conf -r {{ the_date }}-zap-results.html"
+    command: "zap-baseline.py -t http://{{ ansible_host }} -g gen.conf -r {{ common_scan_settings.report_name }}{{ common_scan_settings.dict.zap }}.html"
     log:
-      remote_folder: "/tmp/zap/"
+      remote_folder: "/tmp/{{ common_scan_settings.dict.zap }}/"
       local_folder: "{{ common_scan_settings.local_folder }}"
-      file: "{{ the_date }}-zap-results.html"
+      file: "{{ common_scan_settings.report_name }}{{ common_scan_settings.dict.zap }}.html"
