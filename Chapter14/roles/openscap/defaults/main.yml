@@ -1,9 +1,8 @@
 ---
 # defaults file for roles/openscap
 
-scap_options:
-  clean: false
-  remediation: false
+scap_options_clean: false
+scap_options_remediation: false
 
 scap_packages:
   - "unzip"

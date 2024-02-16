@@ -48,12 +48,12 @@
     recurse: yes
     excludes: "*{{ ansible_facts.distribution | lower }}{{ ansible_facts.distribution_version | replace('.','') }}*"
   register: files_to_delete
-  when: scap_options.clean
+  when: scap_options_clean
 
 - name: "Debug: files to delete"
   ansible.builtin.debug:
     var: files_to_delete.files
-  when: debug
+  when: debug and files_to_delete.files is defined
 
 - name: Remove the files that do not match the pattern
   file:
@@ -61,7 +61,7 @@
     state: absent
   loop: "{{ files_to_delete.files }}"
   when:
-    - scap_options.clean
+    - scap_options_clean 
     - files_to_delete.files is defined
 
 - name: "get information of the SCAP profiles available for the target system"
@@ -174,7 +174,7 @@
 
 - name: "Run the remediation playbook"
   ansible.builtin.command: "ansible-playbook -i {{ inventory_file }} --become --become-method sudo {{ scan_local_output_folder }}/{{ openscap_scan.output_file_playbook }}"
-  when: scap_options.remediation
+  when: scap_options_remediation
   delegate_to: "localhost"
   become: false
   register: remediation_playbook
@@ -182,20 +182,20 @@
 - name: "Debug: remediation playbook"
   ansible.builtin.debug:
     var: remediation_playbook
-  when: debug
+  when: debug and scap_options_remediation
 
 - name: "copy the remediation bash script to the target machine"
   ansible.builtin.copy:
     src: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_bash }}"
     dest: "{{ openscap_scan.output_dir }}"
-  when: scap_options.remediation
+  when: scap_options_remediation
 
 - name: "Run the remediation bash script"
   ansible.builtin.command: "bash {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_bash }}"
-  when: scap_options.remediation
+  when: scap_options_remediation
   register: remediation_bash_script
 
 - name: "Debug: remediation bash script"
   ansible.builtin.debug:
     var: remediation_bash_script
-  when: debug
+  when: debug and scap_options_remediation
