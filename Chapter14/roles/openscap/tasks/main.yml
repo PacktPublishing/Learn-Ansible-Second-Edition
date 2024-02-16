@@ -154,3 +154,20 @@
   delegate_to: "localhost"
   become: false
   notify: "Print the remediation playbook command to run"
+
+- name: "generate SCAP fix bash script"
+  ansible.builtin.command: "oscap xccdf generate fix --fetch-remote-resources --fix-type bash --result-id '' {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }}"
+  ignore_errors: true
+  register: scap_bash_script
+
+- name: "Debug: SCAP fix bash script"
+  ansible.builtin.debug:
+    var: scap_bash_script
+
+- name: "copy SCAP bash script to local machine"
+  copy:
+    content: "{{ scap_bash_script.stdout }}"
+    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_bash }}"
+  when: scap_bash_script is defined
+  delegate_to: "localhost"
+  become: false
