@@ -3,6 +3,7 @@
 
 scap_options:
   clean: false
+  remediation: false
 
 scap_packages:
   - "unzip"
