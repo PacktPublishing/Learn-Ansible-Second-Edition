@@ -10,7 +10,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: create the folder which we will mount inside the container
+- name: "create the folder which we will mount inside the container"
   file:
     path: "{{ item.log.remote_folder }}"
     state: "directory"
@@ -47,7 +47,7 @@
   ansible.builtin.fetch:
     src: "{{ item.log.remote_folder }}{{ item.log.file }}"
     dest: "{{ item.log.local_folder }}"
-    flat: yes
+    flat: true
   loop: "{{ scan }}"
   when: "item.name in scan_types"
   loop_control:
