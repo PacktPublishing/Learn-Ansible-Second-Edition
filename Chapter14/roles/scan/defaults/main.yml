@@ -2,8 +2,8 @@
 # defaults file for roles/scan
 
 scan_types:
-  - "wpscan"
-  - "zap"
+  - "{{ common_scan_settings.dict.wpscan }}"
+  - "{{ common_scan_settings.dict.zap }}"
 
 common_scan_settings:
   detach: false
