@@ -1,0 +1,148 @@
+
+PLAY [ansible_hosts] ***********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-install : update apt-cache and upgrade packages] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-install : add the apt keys from a URL] **********
+changed: [ansiblevm] => (item=http://nginx.org/keys/nginx_signing.key)
+
+TASK [../Chapter05/roles/stack-install : install the repo packages] ************
+changed: [ansiblevm] => (item=deb http://nginx.org/packages/mainline/ubuntu/ jammy nginx)
+changed: [ansiblevm] => (item=deb-src http://nginx.org/packages/mainline/ubuntu/ jammy nginx)
+
+TASK [../Chapter05/roles/stack-install : update cache and install the stack packages] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : add the wordpress group] ***************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : add the wordpress user] ****************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : copy the nginx.conf to /etc/nginx/] ****
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : copy the default.conf to /etc/nginx/conf.d/] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : create the global directory in /etc/nginx/] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : copy the restrictions.conf to /etc/nginx/global/] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : copy the wordpress_shared.conf to /etc/nginx/global/] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : copy the www.conf to /etc/php-fpm.d/] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : configure php.ini] *********************
+changed: [ansiblevm] => (item={'regexp': '^;date.timezone =', 'replace': 'date.timezone = Europe/London'})
+ok: [ansiblevm] => (item={'regexp': '^expose_php = On', 'replace': 'expose_php = Off'})
+changed: [ansiblevm] => (item={'regexp': '^upload_max_filesize = 2M', 'replace': 'upload_max_filesize = 20M'})
+
+TASK [../Chapter05/roles/stack-config : start php-fpm] *************************
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : start nginx] ***************************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : start mariadb] *************************
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : check to see if the ~/.my.cnf file exists] ***
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : change mysql root password if we need to] ***
+changed: [ansiblevm] => (item=127.0.0.1)
+changed: [ansiblevm] => (item=::1)
+changed: [ansiblevm] => (item=ansiblevm)
+changed: [ansiblevm] => (item=localhost)
+
+TASK [../Chapter05/roles/stack-config : set up .my.cnf file] *******************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/stack-config : delete anonymous MySQL user] ***********
+ok: [ansiblevm] => (item=127.0.0.1)
+ok: [ansiblevm] => (item=::1)
+ok: [ansiblevm] => (item=ansiblevm)
+ok: [ansiblevm] => (item=localhost)
+
+TASK [../Chapter05/roles/stack-config : remove the MySQL test database] ********
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : set a fact for the wordpress domain] ******
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : download wp-cli] **************************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : update permissions of wp-cli to allow anyone to execute it] ***
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : create the wordpress database] ************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : create the user for the wordpress database] ***
+changed: [ansiblevm] => (item=127.0.0.1)
+ok: [ansiblevm] => (item=::1)
+ok: [ansiblevm] => (item=ansiblevm)
+ok: [ansiblevm] => (item=localhost)
+
+TASK [../Chapter05/roles/wordpress : are the wordpress files already there?] ***
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : download wordpresss] **********************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : set the correct permissions on the homedir] ***
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : is wordpress already configured?] *********
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : configure wordpress] **********************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : do we need to install wordpress?] *********
+fatal: [ansiblevm]: FAILED! => {"changed": true, "cmd": "/usr/local/bin/wp core is-installed", "delta": "0:00:00.135630", "end": "2024-02-16 14:53:08.250687", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:08.115057", "stderr": "PHP Warning:  Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239\nWarning: Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239\nPHP Warning:  Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239\nWarning: Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239", "stderr_lines": ["PHP Warning:  Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239", "Warning: Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239", "PHP Warning:  Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239", "Warning: Undefined array key \"HTTP_HOST\" in /var/www/wordpress/wp-includes/functions.php on line 6239"], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [../Chapter05/roles/wordpress : install wordpress if needed] **************
+changed: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : do we need to install the plugins?] *******
+failed: [ansiblevm] (item=jetpack) => {"ansible_loop_var": "item", "changed": true, "cmd": "/usr/local/bin/wp plugin is-installed jetpack", "delta": "0:00:00.138633", "end": "2024-02-16 14:53:09.026242", "item": "jetpack", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:08.887609", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+failed: [ansiblevm] (item=wp-super-cache) => {"ansible_loop_var": "item", "changed": true, "cmd": "/usr/local/bin/wp plugin is-installed wp-super-cache", "delta": "0:00:00.125816", "end": "2024-02-16 14:53:09.311833", "item": "wp-super-cache", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:09.186017", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+failed: [ansiblevm] (item=wordpress-seo) => {"ansible_loop_var": "item", "changed": true, "cmd": "/usr/local/bin/wp plugin is-installed wordpress-seo", "delta": "0:00:00.131994", "end": "2024-02-16 14:53:09.601409", "item": "wordpress-seo", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:09.469415", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+failed: [ansiblevm] (item=wordfence) => {"ansible_loop_var": "item", "changed": true, "cmd": "/usr/local/bin/wp plugin is-installed wordfence", "delta": "0:00:00.117972", "end": "2024-02-16 14:53:09.875217", "item": "wordfence", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:09.757245", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+failed: [ansiblevm] (item=nginx-helper) => {"ansible_loop_var": "item", "changed": true, "cmd": "/usr/local/bin/wp plugin is-installed nginx-helper", "delta": "0:00:00.116345", "end": "2024-02-16 14:53:10.158575", "item": "nginx-helper", "msg": "non-zero return code", "rc": 1, "start": "2024-02-16 14:53:10.042230", "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [../Chapter05/roles/wordpress : set a fact if we don't need to install the plugins] ***
+skipping: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : set a fact if we need to install the plugins] ***
+ok: [ansiblevm]
+
+TASK [../Chapter05/roles/wordpress : install the plugins if we need to or ignore if not] ***
+changed: [ansiblevm] => (item=jetpack)
+changed: [ansiblevm] => (item=wp-super-cache)
+changed: [ansiblevm] => (item=wordpress-seo)
+changed: [ansiblevm] => (item=wordfence)
+changed: [ansiblevm] => (item=nginx-helper)
+
+RUNNING HANDLER [../Chapter05/roles/stack-config : restart nginx] **************
+changed: [ansiblevm]
+
+RUNNING HANDLER [../Chapter05/roles/stack-config : restart php-fpm] ************
+changed: [ansiblevm]
+
+PLAY RECAP *********************************************************************
+ansiblevm                  : ok=39   changed=28   unreachable=0    failed=0    skipped=1    rescued=0    ignored=2   
+

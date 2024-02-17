@@ -1,0 +1,116 @@
+
+PLAY [ansible_hosts] ***********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ansiblevm]
+
+TASK [common : set a fact for the date] ****************************************
+ok: [ansiblevm]
+
+TASK [openscap : update apt cache and upgrade packages] ************************
+ok: [ansiblevm]
+
+TASK [openscap : install common packages] **************************************
+ok: [ansiblevm]
+
+TASK [openscap : create the directory to store the scap security guide content] ***
+ok: [ansiblevm]
+
+TASK [openscap : download the latest scap security guide content] **************
+skipping: [ansiblevm]
+
+TASK [openscap : Debug: scap download result] **********************************
+skipping: [ansiblevm]
+
+TASK [openscap : move scap security guide content to the correct location] *****
+skipping: [ansiblevm]
+
+TASK [openscap : remove the downloaded scap security guide content] ************
+skipping: [ansiblevm]
+
+TASK [openscap : find files that do not contain ubuntu2204 in the specified types] ***
+skipping: [ansiblevm]
+
+TASK [openscap : Debug: files to delete] ***************************************
+skipping: [ansiblevm]
+
+TASK [openscap : Remove the files that do not match the pattern] ***************
+skipping: [ansiblevm]
+
+TASK [openscap : get information of the SCAP profiles available for the target system] ***
+changed: [ansiblevm]
+
+TASK [openscap : Debug: SCAP profiles available for the target system] *********
+skipping: [ansiblevm]
+
+TASK [openscap : extract profile name based on our selection criteria] *********
+ok: [ansiblevm]
+
+TASK [openscap : Debug: profile name] ******************************************
+skipping: [ansiblevm]
+
+TASK [openscap : Run SCAP scan] ************************************************
+fatal: [ansiblevm]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
+...ignoring
+
+TASK [openscap : Debug: SCAP scan] *********************************************
+skipping: [ansiblevm]
+
+TASK [openscap : set a fact to lock in the date and time of the scan for the output folder name] ***
+ok: [ansiblevm]
+
+TASK [openscap : Debug: local output folder] ***********************************
+skipping: [ansiblevm]
+
+TASK [openscap : ensure the local output directory exists] *********************
+changed: [ansiblevm -> localhost]
+
+TASK [openscap : copy the SCAP repoort and results file to local machine] ******
+changed: [ansiblevm] => (item=/tmp/ansiblevm-result.xml)
+changed: [ansiblevm] => (item=/tmp/ansiblevm-report.html)
+
+TASK [openscap : generate SCAP guide] ******************************************
+changed: [ansiblevm]
+
+TASK [openscap : Debug: SCAP guide] ********************************************
+skipping: [ansiblevm]
+
+TASK [openscap : copy SCAP guide to local machine] *****************************
+changed: [ansiblevm -> localhost]
+
+TASK [openscap : generate SCAP fix playbook] ***********************************
+changed: [ansiblevm]
+
+TASK [openscap : Debug: SCAP fix playbook] *************************************
+skipping: [ansiblevm]
+
+TASK [openscap : copy SCAP playbook to local machine] **************************
+changed: [ansiblevm -> localhost]
+
+TASK [openscap : generate SCAP fix bash script] ********************************
+changed: [ansiblevm]
+
+TASK [openscap : Debug: SCAP fix bash script] **********************************
+skipping: [ansiblevm]
+
+TASK [openscap : copy SCAP bash script to local machine] ***********************
+changed: [ansiblevm -> localhost]
+
+TASK [openscap : Run the remediation playbook] *********************************
+skipping: [ansiblevm]
+
+TASK [openscap : Debug: remediation playbook] **********************************
+skipping: [ansiblevm]
+
+TASK [openscap : copy the remediation bash script to the target machine] *******
+skipping: [ansiblevm]
+
+TASK [openscap : Run the remediation bash script] ******************************
+skipping: [ansiblevm]
+
+TASK [openscap : Debug: remediation bash script] *******************************
+skipping: [ansiblevm]
+
+PLAY RECAP *********************************************************************
+ansiblevm                  : ok=17   changed=10   unreachable=0    failed=0    skipped=19   rescued=0    ignored=1   
+

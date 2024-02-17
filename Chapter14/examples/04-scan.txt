@@ -1,0 +1,52 @@
+
+PLAY [ansible_hosts] ***********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [ansiblevm]
+
+TASK [common : set a fact for the date] ****************************************
+ok: [ansiblevm]
+
+TASK [docker : install prerequisites for Docker] *******************************
+changed: [ansiblevm]
+
+TASK [docker : add Docker's official GPG key] **********************************
+changed: [ansiblevm]
+
+TASK [docker : add Docker repository] ******************************************
+changed: [ansiblevm]
+
+TASK [docker : install Docker packages] ****************************************
+changed: [ansiblevm]
+
+TASK [docker : ensure Docker service is running] *******************************
+ok: [ansiblevm]
+
+TASK [scan : pull the Docker image for the scanning tool] **********************
+changed: [ansiblevm] => (item=wpscan)
+changed: [ansiblevm] => (item=zap)
+
+TASK [scan : create the folder which we will mount inside the container] *******
+changed: [ansiblevm] => (item=wpscan)
+changed: [ansiblevm] => (item=zap)
+
+TASK [scan : run the scan] *****************************************************
+changed: [ansiblevm] => (item=None)
+failed: [ansiblevm] (item=None) => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
+fatal: [ansiblevm]: FAILED! => {"censored": "the output has been hidden due to the fact that 'no_log: true' was specified for this result", "changed": true}
+...ignoring
+
+TASK [scan : Debug: docker_scan] ***********************************************
+skipping: [ansiblevm]
+
+TASK [scan : download the report] **********************************************
+changed: [ansiblevm] => (item=wpscan)
+changed: [ansiblevm] => (item=zap)
+
+TASK [scan : remove the scan container] ****************************************
+changed: [ansiblevm] => (item=wpscan)
+changed: [ansiblevm] => (item=zap)
+
+PLAY RECAP *********************************************************************
+ansiblevm                  : ok=12   changed=9    unreachable=0    failed=0    skipped=1    rescued=0    ignored=1   
+

@@ -1,0 +1,81 @@
+_______________________________________________________________
+         __          _______   _____
+         \ \        / /  __ \ / ____|
+          \ \  /\  / /| |__) | (___   ___  __ _ _ __ ®
+           \ \/  \/ / |  ___/ \___ \ / __|/ _` | '_ \
+            \  /\  /  | |     ____) | (__| (_| | | | |
+             \/  \/   |_|    |_____/ \___|\__,_|_| |_|
+
+         WordPress Security Scanner by the WPScan Team
+                         Version 3.8.25
+       Sponsored by Automattic - https://automattic.com/
+       @_WPScan_, @ethicalhack3r, @erwan_lr, @firefart
+_______________________________________________________________
+
+[+] URL: http://192.168.64.15.nip.io/ [192.168.64.15]
+[+] Started: Fri Feb 16 14:55:23 2024
+
+Interesting Finding(s):
+
+[+] Headers
+ | Interesting Entry: Server: nginx/1.25.4
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[+] XML-RPC seems to be enabled: http://192.168.64.15.nip.io/xmlrpc.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+ | References:
+ |  - http://codex.wordpress.org/XML-RPC_Pingback_API
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_ghost_scanner/
+ |  - https://www.rapid7.com/db/modules/auxiliary/dos/http/wordpress_xmlrpc_dos/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_xmlrpc_login/
+ |  - https://www.rapid7.com/db/modules/auxiliary/scanner/http/wordpress_pingback_access/
+
+[+] The external WP-Cron seems to be enabled: http://192.168.64.15.nip.io/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[+] WordPress version 6.4.3 identified (Latest, released on 2024-01-30).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://192.168.64.15.nip.io/?feed=rss2, <generator>https://wordpress.org/?v=6.4.3</generator>
+ |  - http://192.168.64.15.nip.io/?feed=comments-rss2, <generator>https://wordpress.org/?v=6.4.3</generator>
+
+[+] WordPress theme in use: twentytwentyfour
+ | Location: http://192.168.64.15.nip.io/wp-content/themes/twentytwentyfour/
+ | Style URL: http://192.168.64.15.nip.io/wp-content/themes/twentytwentyfour/style.css
+ | Style Name: Twenty Twenty-Four
+ | Style URI: https://wordpress.org/themes/twentytwentyfour/
+ | Description: Twenty Twenty-Four is designed to be flexible, versatile and applicable to any website. Its collecti...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org
+ |
+ | Found By: Urls In Homepage (Passive Detection)
+ | Confirmed By: Urls In 404 Page (Passive Detection)
+ |
+ | Version: 1.0 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://192.168.64.15.nip.io/wp-content/themes/twentytwentyfour/style.css, Match: 'Version: 1.0'
+
+
+[i] User(s) Identified:
+
+[+] ansible
+ | Found By: Author Posts - Display Name (Passive Detection)
+ | Confirmed By:
+ |  Rss Generator (Passive Detection)
+ |  Login Error Messages (Aggressive Detection)
+
+[!] No WPScan API Token given, as a result vulnerability data has not been output.
+[!] You can get a free API token with 25 daily requests by registering at https://wpscan.com/register
+
+[+] Finished: Fri Feb 16 14:55:26 2024
+[+] Requests Done: 57
+[+] Cached Requests: 7
+[+] Data Sent: 15.015 KB
+[+] Data Received: 1019.422 KB
+[+] Memory used: 245.164 MB
+[+] Elapsed time: 00:00:02
