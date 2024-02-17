@@ -55,7 +55,7 @@
     var: files_to_delete.files
   when: debug and files_to_delete.files is defined
 
-- name: Remove the files that do not match the pattern
+- name: "remove the files that do not match the pattern"
   file:
     path: "{{ item.path }}"
     state: absent
@@ -82,7 +82,7 @@
     var: profile_name
   when: debug
 
-- name: "Run SCAP scan"
+- name: "run OpenSCAP scan"
   ansible.builtin.command: "oscap xccdf eval --profile {{ profile_name }} --results-arf {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }} --report {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_html }} {{ openscap_scan.ssg_file_name }}"
   ignore_errors: true
   no_log: true
@@ -91,15 +91,6 @@
 - name: "Debug: SCAP scan"
   ansible.builtin.debug:
     var: scap_scan
-  when: debug
-
-- name: "set a fact to lock in the date and time of the scan for the output folder name"
-  ansible.builtin.set_fact:
-    scan_local_output_folder: "{{ openscap_scan.local_output_dir }}"
-
-- name: "Debug: local output folder"
-  ansible.builtin.debug:
-    var: scan_local_output_folder
   when: debug
 
 - name: "ensure the local output directory exists"
@@ -112,7 +103,7 @@
 - name: "copy the SCAP repoort and results file to local machine"
   ansible.builtin.fetch:
     src: "{{ item }}"
-    dest: "{{ scan_local_output_folder }}/"
+    dest: "{{ openscap_scan.local_output_dir }}/"
     flat: true
   with_items: 
     - "{{ openscap_scan.output_dir }}{{ openscap_scan.output_file_xml }}"
@@ -131,7 +122,7 @@
 - name: "copy SCAP guide to local machine"
   copy:
     content: "{{ scap_guide.stdout }}"
-    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_guide }}"
+    dest: "{{ openscap_scan.local_output_dir }}/{{ openscap_scan.output_file_guide }}"
   when: scap_guide is defined
   delegate_to: "localhost"
   become: false
@@ -149,7 +140,7 @@
 - name: "copy SCAP playbook to local machine"
   copy:
     content: "{{ scap_playbook.stdout }}"
-    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_playbook }}"
+    dest: "{{ openscap_scan.local_output_dir }}/{{ openscap_scan.output_file_playbook }}"
   when: scap_playbook is defined
   delegate_to: "localhost"
   become: false
@@ -167,13 +158,13 @@
 - name: "copy SCAP bash script to local machine"
   copy:
     content: "{{ scap_bash_script.stdout }}"
-    dest: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_bash }}"
+    dest: "{{ openscap_scan.local_output_dir }}/{{ openscap_scan.output_file_bash }}"
   when: scap_bash_script is defined
   delegate_to: "localhost"
   become: false
 
-- name: "Run the remediation playbook"
-  ansible.builtin.command: "ansible-playbook -i {{ inventory_file }} --become --become-method sudo {{ scan_local_output_folder }}/{{ openscap_scan.output_file_playbook }}"
+- name: "run the remediation playbook"
+  ansible.builtin.command: "ansible-playbook -i {{ inventory_file }} --become --become-method sudo {{ openscap_scan.local_output_dir }}/{{ openscap_scan.output_file_playbook }}"
   when: scap_options_remediation
   delegate_to: "localhost"
   become: false
@@ -186,11 +177,11 @@
 
 - name: "copy the remediation bash script to the target machine"
   ansible.builtin.copy:
-    src: "{{ scan_local_output_folder }}/{{ openscap_scan.output_file_bash }}"
+    src: "{{ openscap_scan.local_output_dir }}/{{ openscap_scan.output_file_bash }}"
     dest: "{{ openscap_scan.output_dir }}"
   when: scap_options_remediation
 
-- name: "Run the remediation bash script"
+- name: "run the remediation bash script"
   ansible.builtin.command: "bash {{ openscap_scan.output_dir }}{{ openscap_scan.output_file_bash }}"
   when: scap_options_remediation
   register: remediation_bash_script
