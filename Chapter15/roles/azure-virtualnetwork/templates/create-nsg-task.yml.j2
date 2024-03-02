@@ -1,0 +1,33 @@
+---
+
+{% for item in nsg_config %}
+- name: create network security group for {{ item.name }}
+  azure_rm_securitygroup:
+    resource_group: "{{ resource_group_name }}"
+    name: "{{ item.name }}"
+    tags: "{{ common_tags }}"
+    rules:
+{% for item in item.rules if item.public == false %}
+      - name: "{{ item.name }}"
+        description: "{{ item.description }}"
+        protocol: "{{ item.protocol }}"
+        source_address_prefix:
+{% for item in item.ips | unique %}
+            - "{{ item }}"
+{% endfor %}
+        destination_port_range: "{{ item.destination_port }}"
+        access: "{{ item.access }}"
+        priority: "{{ item.priority }}"
+        direction: "{{ item.direction }}"
+{% endfor %}
+{% for item in item.rules if item.public == true %}
+      - name: "{{ item.name }}"
+        description: "{{ item.description }}"
+        protocol: "{{ item.protocol }}"
+        source_address_prefix: "*"
+        destination_port_range: "{{ item.destination_port }}"
+        access: "{{ item.access }}"
+        priority: "{{ item.priority }}"
+        direction: "{{ item.direction }}"
+{% endfor %}
+{% endfor %}

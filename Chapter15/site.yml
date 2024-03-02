@@ -1,0 +1,17 @@
+---
+
+- name: Deploy and configure the Azure Environment
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - roles/azure-rg
+    - roles/azure-virtualnetwork
+
+  # tasks:
+  #     - ansible.builtin.debug:
+  #         msg: "I am connecting to {{ ansible_nodename }} which is running {{ ansible_distribution }} {{ ansible_distribution_version }}"

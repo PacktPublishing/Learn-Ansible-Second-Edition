@@ -1,0 +1,81 @@
+---
+
+debug_output: false
+genterate_key: false
+
+app:
+  name: "learnansible-wordpress" # don't get too creative
+  shortname: "ansiblewp" # all lower-case, all one word
+  location: "westeurope" # loction of where the resources are to be created
+  location_short: "euw" # short name for the location
+  env: "prod" # enviroment tag for the app
+  public_dns_name: "learnansible" # the public dns name for the app
+
+common_tags:
+  "project": "{{ app.name }}"
+  "environment": "{{ app.env }}"
+  "deployed_by": "ansible"
+
+# Dictionary
+##################################################
+azure_dict:
+  ansible_warning: "Resource managed by Ansible"
+  nsg: "nsg"
+  resource_group: "rg"
+  subnet: "snet"
+  virtualnetwork: "vnet"
+
+# Resource names
+##################################################
+
+nsg_name: "{{ azure_dict.nsg }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+resource_group_name: "{{ azure_dict.resource_group }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+virtual_network_name: "{{ azure_dict.virtualnetwork }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+
+# Virtual network
+##################################################
+
+vnet_config:
+  cidr_block: "10.0.0.0/24"
+  subnets:
+    - {
+        name: "{{ azure_dict.subnet }}-vms-{{ app.name }}-{{app.env}}-{{ app.location_short }}",
+        subnet: "10.0.0.0/27",
+        private: true,
+        service_endpoints: "Microsoft.Storage",
+      }
+
+trusted_ips:
+  - ""
+
+dynamic_ips:
+  - "{{ your_public_ip }}" # The IP address of whomever is running Ansible
+
+nsg_rules:
+  - name: "allowHTTP"
+    description: "{{ azure_dict.ansible_warning }}"
+    protocol: "Tcp"
+    destination_port_range: "80"
+    source_address_prefix: "*"
+    access: "Allow"
+    priority: "100"
+    direction: "Inbound"
+  - name: "allowSSH"
+    description: "{{ azure_dict.ansible_warning }}"
+    protocol: "Tcp"
+    destination_port_range: "{{ load_balancer.ssh_port }}"
+    source_address_prefix: "{{ trusted_ips|select() + dynamic_ips | unique }}"
+    access: "Allow"
+    priority: "150"
+    direction: "Inbound"
+
+load_balancer:
+  ssh_port: "22"
+  ssh_port_backend: "22"
+  http_port: "80"
+  http_port_backend: "80"
+
+# Some other settings
+##################################################
+location: "{{ app.location }}"
+hosts_group: "vmgroup"
