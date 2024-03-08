@@ -1,0 +1,20 @@
+---
+
+# Application and basicAzure Resource Configuration
+##################################################
+
+debug_output: false
+genterate_key: false
+
+app:
+  name: "learnansible-wordpress" # don't get too creative
+  shortname: "ansiblewp" # all lower-case, all one word
+  location: "westeurope" # loction of where the resources are to be created
+  location_short: "euw" # short name for the location
+  env: "prod" # enviroment tag for the app
+  public_dns_name: "learnansible" # the public dns name for the app
+
+common_tags:
+  "project": "{{ app.name }}"
+  "environment": "{{ app.env }}"
+  "deployed_by": "ansible"
