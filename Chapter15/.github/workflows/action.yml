@@ -15,7 +15,6 @@ jobs:
   scan_ansible_playbook:
     name: "Scan Ansible Playbook"
     runs-on: ubuntu-latest
-    permissions: write-all
     defaults:
       run:
         shell: bash
