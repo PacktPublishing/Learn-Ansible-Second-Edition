@@ -1,6 +1,5 @@
 # kics-scan disable=555ab8f9-2001-455e-a077-f2d0f41e2fb9
 
-
 name: "Ansible Playbook Run"
 
 env:
@@ -16,8 +15,7 @@ jobs:
   scan_ansible_playbook:
     name: "Scan Ansible Playbook"
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
+    permissions: write-all
     defaults:
       run:
         shell: bash
@@ -39,13 +37,6 @@ jobs:
           output_formats: "json,sarif"
           fail_on: "${{ env.FAIL_ON }}"
           enable_jobs_summary: true
-
-      - name: Upload SARIF file
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{env.RESULTS_DIR}}/results.sarif
-          wait-for-processing: true 
 
   run_ansible_playbook:
     name: "Install Ansible and run Playbook"
