@@ -1,5 +1,6 @@
 # kics-scan disable=555ab8f9-2001-455e-a077-f2d0f41e2fb9
 
+
 name: "Ansible Playbook Run"
 
 env:
@@ -15,12 +16,17 @@ jobs:
   scan_ansible_playbook:
     name: "Scan Ansible Playbook"
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     defaults:
       run:
         shell: bash
 
     steps:
-      - uses: actions/checkout@v4
+      - name: "Checkout the code"
+        uses: "actions/checkout@v4"
+        with:
+          token: "${{ secrets.GH_PAT }}"
 
       - name: "Create the folder for storing the scan results"
         run: mkdir -p ${{env.RESULTS_DIR}}
@@ -71,8 +77,9 @@ jobs:
           fi
           
       - name: "Checkout the code"
-        id: "checkout"
         uses: "actions/checkout@v4"
+        with:
+          token: "${{ secrets.GH_PAT }}"
 
       - name: "Login to Azure using a service principal"
         uses: "Azure/login@v2"
