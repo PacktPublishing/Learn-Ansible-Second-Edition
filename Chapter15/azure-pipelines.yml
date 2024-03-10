@@ -4,8 +4,7 @@ trigger:
   - main
 
 variables:
-  breakSeverity: "MEDIUM"
-  subscriptionName: "azConnection"
+  - group: playbook
 
 pool:
   vmImage: ubuntu-latest
