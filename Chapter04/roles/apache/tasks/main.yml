@@ -1,50 +1,51 @@
 ---
 # tasks file for roles/apache
 
-- name: "install apache packages"
+- name: Install apache packages
   ansible.builtin.apt:
-    state: "latest"
+    state: "present"
     pkg: "{{ apache_packages }}"
 
-- name: "add user to apache group"
+- name: Add user to apache group
   ansible.builtin.user:
     name: "{{ item.name }}"
     groups: "{{ apache_group }}"
     append: true
   with_items: "{{ users }}"
 
-- name: "create the document root for our website"
+- name: Create the document root for our website
   ansible.builtin.file:
     dest: "{{ document_root }}"
-    state: "directory"
+    state: directory
     mode: "0755"
     owner: "{{ users.0.name }}"
     group: "{{ apache_group }}"
 
-- name: "set the permissions on the user folder"
+- name: Set the permissions on the user folder
   ansible.builtin.file:
-    dest: "/home/{{ users.0.name }}/"
-    state: "directory"
+    dest: /home/{{ users.0.name }}/
+    state: directory
     mode: "0755"
     owner: "{{ users.0.name }}"
 
-- name: "remove the apache default vhost config"
+- name: Remove the apache default vhost config
   ansible.builtin.file:
     path: "{{ vhost_path }}{{ vhost_default_file }}"
-    state: "absent"
-  notify: "restart apache2"
+    state: absent
+  notify: restart apache2
 
-- name: "copy the our vhost.conf to the sites-enabled folder"
+- name: Copy the our vhost.conf to the sites-enabled folder
   ansible.builtin.template:
-    src: "vhost.conf.j2"
+    src: vhost.conf.j2
     dest: "{{ vhost_path }}{{ vhost_our_file }}"
-  notify: "restart apache2"
+    mode: "0644"
+  notify: restart apache2
 
-- name: "copy the test HTML page to the document root"
+- name: Copy the test HTML page to the document root
   ansible.builtin.template:
-    src: "index.html.j2"
+    src: index.html.j2
     dest: "{{ document_root }}/index.html"
     mode: "0644"
     owner: "{{ users.0.name }}"
     group: "{{ apache_group }}"
-  when: html_deploy == true
+  when: html_deploy

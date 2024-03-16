@@ -1,14 +1,15 @@
 ---
-- hosts: ansible_hosts
+- name: Print some secrets
+  hosts: ansible_hosts
   gather_facts: true
   become: true
-  become_method: sudo
+  become_method: ansible.builtin.sudo
 
   vars_files:
-    - "group_vars/common.yml"
+    - group_vars/common.yml
 
   roles:
-    - "roles/common"
-    - "roles/apache"
-    - "roles/mariadb"
-    - "roles/php"
+    - common
+    - apache
+    - mariadb
+    - php

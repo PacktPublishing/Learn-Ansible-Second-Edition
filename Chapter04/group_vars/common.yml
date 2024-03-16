@@ -1,3 +1,4 @@
+---
 html_body: |
   This HTML page has been deployed using Ansible to <b>{{ ansible_nodename }}</b>.<br>
   The user is <b>{{ users.0.name }}</b> who is in the <b>{{ apache_group }}</b> group.<br>
