@@ -1,9 +1,10 @@
 ---
 
-- hosts: ansible_hosts
+- name: "Install all packages and install ntp"
+  hosts: "ansible_hosts"
   gather_facts: true
-  become: yes
-  become_method: sudo
+  become: true
+  become_method: "ansible.builtin.sudo"
 
   vars:
     ntp_servers:
@@ -13,25 +14,30 @@
       - "3.uk.pool.ntp.org"
 
   handlers:
-    - name: "restart ntp"
+    - name: "Restart ntp"
       ansible.builtin.service:
         name: "ntp"
         state: "restarted"
 
   tasks:
-    - ansible.builtin.debug:
+    - name: "Output some information on our host"
+      ansible.builtin.debug:
         msg: "I am connecting to {{ ansible_nodename }} which is running {{ ansible_distribution }} {{ ansible_distribution_version }}"
-    - ansible.builtin.apt:
+    - name: "Update all packages to the latest version"
+      ansible.builtin.apt:
         name: "*"
         state: "latest"
-        update_cache: "yes"
-    - ansible.builtin.apt:
-        state: "latest"
+        update_cache: true
+    - name: "Install packages"
+      ansible.builtin.apt:
+        state: "present"
         pkg:
           - "ntp"
           - "sntp"
           - "ntp-doc"
-    - ansible.builtin.template:
+    - name: "Configure NTP"
+      ansible.builtin.template:
         src: "./ntp.conf.j2"
         dest: "/etc/ntp.conf"
-      notify: "restart ntp"
+        mode: "0644"
+      notify: "Restart ntp"
