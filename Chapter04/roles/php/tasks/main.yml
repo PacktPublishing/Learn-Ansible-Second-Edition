@@ -5,7 +5,7 @@
   ansible.builtin.apt:
     state: "present"
     pkg: "{{ php_packages }}"
-  notify: restart apache2
+  notify: "Restart apache2"
 
 - name: "Copy the PHP info to the document root"
   ansible.builtin.copy:
@@ -36,4 +36,4 @@
     dest: "{{ vhost_path }}adminer.conf"
     mode: "0755"
   when: adminer.install
-  notify: restart apache2
+  notify: "Restart apache2"

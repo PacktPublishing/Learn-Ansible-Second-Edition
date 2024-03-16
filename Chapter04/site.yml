@@ -1,5 +1,6 @@
 ---
-- name: Print some secrets
+
+- name: "Install LAMP stack"
   hosts: ansible_hosts
   gather_facts: true
   become: true
