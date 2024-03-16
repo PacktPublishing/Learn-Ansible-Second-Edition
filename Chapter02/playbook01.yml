@@ -1,8 +1,10 @@
 ---
-- hosts: ansible_hosts
+
+- name: "Run the role locally"
+  hosts: "ansible_hosts"
   gather_facts: true
-  become: yes
-  become_method: sudo
+  become: true
+  become_method: "ansible.builtin.sudo"
 
   roles:
-    - roles/learnansible-example-role
+    - learnansible-example-role

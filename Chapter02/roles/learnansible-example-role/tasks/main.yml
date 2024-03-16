@@ -1,19 +1,23 @@
 ---
 # tasks file for roles/learnansible-example-role
 
-- ansible.builtin.apt:
+- name: "Update all packages to the latest version"
+  ansible.builtin.apt:
     name: "*"
     state: "latest"
-    update_cache: "yes"
+    update_cache: true
 
-- ansible.builtin.apt:
-    state: "latest"
+- name: "Install packages"
+  ansible.builtin.apt:
+    state: "present"
     pkg:
       - "ntp"
       - "sntp"
       - "ntp-doc"
 
-- ansible.builtin.template:
+- name: "Configure NTP"
+  ansible.builtin.template:
     src: "./ntp.conf.j2"
     dest: "/etc/ntp.conf"
-  notify: "restart ntp"
+    mode: "0644"
+  notify: "Restart ntp"

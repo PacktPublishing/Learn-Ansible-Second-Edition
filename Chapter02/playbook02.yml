@@ -1,8 +1,10 @@
 ---
-- hosts: ansible_hosts
+
+- name: "Run the remote roles"
+  hosts: "ansible_hosts"
   gather_facts: true
-  become: yes
-  become_method: sudo
+  become: true
+  become_method: "ansible.builtin.sudo"
 
   roles:
     - "itnok.update_ubuntu"
