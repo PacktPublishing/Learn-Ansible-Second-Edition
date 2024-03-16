@@ -1,13 +1,15 @@
 ---
-- hosts: ansible_hosts
+
+- name: "Install and confugure WordPress and supporting software"
+  hosts: "ansible_hosts"
   gather_facts: true
   become: true
-  become_method: sudo
+  become_method: "ansible.builtin.sudo"
 
   vars_files:
     - "group_vars/common.yml"
 
   roles:
-    - "roles/stack-install"
-    - "roles/stack-config"
-    - "roles/wordpress"
+    - "stack_install"
+    - "stack_config"
+    - "wordpress"
