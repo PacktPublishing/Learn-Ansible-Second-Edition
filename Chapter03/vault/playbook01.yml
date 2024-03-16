@@ -1,9 +1,12 @@
 ---
-- hosts: localhost
+
+- name: "Print some secrets"
+  hosts: "localhost"
   vars_files:
     - "myvars.yml"
   tasks:
-    - ansible.builtin.debug:
+    - name: "Print the vault content"
+      ansible.builtin.debug:
         msg:
-         - "The username is {{ username }} and password is {{ password }}, also the API key is {{ secretapikey }}"
-         - "I am going to install {{ packages }}"
+          - "The username is {{ username }} and password is {{ password }}, also the API key is {{ secretapikey }}"
+          - "I am going to install {{ packages }}"
