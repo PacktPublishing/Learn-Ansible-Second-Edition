@@ -1,6 +1,6 @@
 ---
 
-- name: "Install all packages and install ntp"
+- name: "Update all packages and install and configure NTP"
   hosts: "ansible_hosts"
   gather_facts: true
   become: true

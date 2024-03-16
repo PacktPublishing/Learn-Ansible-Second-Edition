@@ -7,6 +7,6 @@
   become_method: "ansible.builtin.sudo"
 
   tasks:
-    - name: "A quick test"
+    - name: "Output some information on our host"
       ansible.builtin.debug:
         msg: "I am connecting to {{ ansible_nodename }} which is running {{ ansible_distribution }} {{ ansible_distribution_version }}"
