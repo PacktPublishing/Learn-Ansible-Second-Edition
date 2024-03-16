@@ -1,4 +1,6 @@
 galaxy_info:
+  role_name: "ansible_role_learnansible_example"
+  namespace: "russmckendrick"
   author: "Russ McKendrick"
   description: "Example role to accompany Learn Ansible (Second Edition)"
   issue_tracker_url: "https://github.com/russmckendrick/ansible-role-learnansible-example/issues"
@@ -12,3 +14,4 @@ galaxy_info:
     - "ntp"
     - "time"
     - "example"
+dependencies: []

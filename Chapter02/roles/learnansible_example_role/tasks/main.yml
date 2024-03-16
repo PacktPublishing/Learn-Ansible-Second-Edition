@@ -6,6 +6,8 @@
     name: "*"
     state: "latest"
     update_cache: true
+  tags:
+    - "skip_ansible_lint"
 
 - name: "Install packages"
   ansible.builtin.apt:

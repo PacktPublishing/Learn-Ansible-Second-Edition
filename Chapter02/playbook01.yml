@@ -7,4 +7,4 @@
   become_method: "ansible.builtin.sudo"
 
   roles:
-    - learnansible-example-role
+    - learnansible_example_role
