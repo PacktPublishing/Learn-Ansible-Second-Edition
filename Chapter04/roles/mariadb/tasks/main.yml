@@ -1,18 +1,18 @@
 ---
 # tasks file for roles/mariadb
 
-- name: Install mariadb packages
+- name: "Install mariadb packages"
   ansible.builtin.apt:
     state: "present"
     pkg: "{{ mariadb_packages }}"
 
-- name: Start mariadb
+- name: "Start mariadb"
   ansible.builtin.service:
     name: mariadb
     state: started
     enabled: "yes"
 
-- name: Check to see if the ~/.my.cnf file exists
+- name: "Check to see if the ~/.my.cnf file exists"
   ansible.builtin.stat:
     path: ~/.my.cnf
   register: mycnf
