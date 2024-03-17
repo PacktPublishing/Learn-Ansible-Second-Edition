@@ -5,10 +5,10 @@
   ansible.builtin.service:
     name: nginx
     state: restarted
-    enabled: "yes"
+    enabled: true
 
 - name: "Restart php-fpm"
   ansible.builtin.service:
     name: "{{ php_service_name }}"
     state: restarted
-    enabled: "yes"
+    enabled: true

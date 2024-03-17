@@ -19,14 +19,14 @@
 - name: "Create the wordpress database"
   community.mysql.mysql_db:
     db: "{{ wp_database.name }}"
-    state: present
+    state: "present"
 
 - name: "Create the user for the wordpress database"
   community.mysql.mysql_user:
     name: "{{ wp_database.username }}"
     password: "{{ wp_database.password }}"
     priv: "{{ wp_database.name }}.*:ALL"
-    state: present
+    state: "present"
   with_items: "{{ mariadb.hosts }}"
 
 # Install wordpress
