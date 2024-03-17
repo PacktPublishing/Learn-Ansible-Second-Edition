@@ -77,6 +77,15 @@
 
 # PHP configuration tasks
 
+- name: "Get the PHP version"
+  ansible.builtin.shell:
+    cmd: "php -v | head -n 1 | cut -d ' ' -f 2 | cut -c 1-3"
+  register: php_version_output
+
+- name: "Set the PHP version"
+  ansible.builtin.set_fact:
+    php_version: "{{ php_version_output.stdout }}"
+
 - name: "Copy the www.conf to /etc/php-fpm.d/"
   ansible.builtin.template:
     src: php-fpmd-www.conf.j2
