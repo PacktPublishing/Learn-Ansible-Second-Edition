@@ -107,6 +107,10 @@
     login_unix_socket: /var/run/mysqld/mysqld.sock
   with_items: "{{ mariadb.hosts }}"
   when: not mycnf.stat.exists
+  register: change_mysql_password_result
+  retries: 3
+  delay: 10
+  until: change_mysql_password_result is not failed
 
 - name: "Set up .my.cnf file"
   ansible.builtin.template:
