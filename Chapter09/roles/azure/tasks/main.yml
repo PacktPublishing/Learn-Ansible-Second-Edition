@@ -154,7 +154,7 @@
 - name: "Check user has a key, if not create one for {{ ansible_user_id }}"
   ansible.builtin.user:
     name: "{{ ansible_user_id }}"
-    generate_ssh_key: "yes"
+    generate_ssh_key: true
     ssh_key_file: "~/.ssh/id_rsa"
   when: genterate_key
 
