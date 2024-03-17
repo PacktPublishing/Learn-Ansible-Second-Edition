@@ -16,9 +16,9 @@ php:
     - { regexp: "^;date.timezone =", replace: "date.timezone = Europe/London" }
     - { regexp: "^expose_php = On", replace: "expose_php = Off" }
     - {
-        regexp: "^upload_max_filesize = 2M",
-        replace: "upload_max_filesize = 20M",
-      }
+      regexp: "^upload_max_filesize = 2M",
+      replace: "upload_max_filesize = 20M",
+    }
 
 mariadb:
   bind: "127.0.0.1"

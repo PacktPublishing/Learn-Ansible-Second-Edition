@@ -1,13 +1,13 @@
 ---
 # tasks file for roles/stack-install
 
-- name: "include the operating system specific variables"
+- name: "Include the operating system specific variables"
   ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
-- name: "install the stack on Debian based systems"
+- name: "Install the stack on Debian based systems"
   ansible.builtin.import_tasks: "Debian.yml"
   when: ansible_os_family == 'Debian'
 
-- name: "install the stack on RedHat based systems"
+- name: "Install the stack on RedHat based systems"
   ansible.builtin.import_tasks: "RedHat.yml"
   when: ansible_os_family == 'RedHat'
