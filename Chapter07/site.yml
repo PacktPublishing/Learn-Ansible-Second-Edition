@@ -1,14 +1,14 @@
 ---
 
-- hosts: ansible_hosts
+- name: "Install IIS, .NET, create user, install chocolatey and display info"
+  hosts: "ansible_hosts"
   gather_facts: true
-  
   vars_files:
-    - group_vars/common.yml
+    - "group_vars/common.yml"
 
   roles:
-    - roles/iis
-    - roles/dotnet
-    - roles/user
-    - roles/choco
-    - roles/info
+    - "iis"
+    - "dotnet"
+    - "user"
+    - "choco"
+    - "info"
