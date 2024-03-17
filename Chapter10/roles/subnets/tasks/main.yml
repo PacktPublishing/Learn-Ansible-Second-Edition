@@ -64,8 +64,8 @@
       "tag:projectName": "{{ app.name }}"
   register: subnets_public_output
 
-- name: register just the IDs for each of the subnets
-  set_fact:
+- name: "Register just the IDs for each of the subnets"
+  ansible.builtin.set_fact:
     subnet_compute_ids: "{{ subnets_compute_output.subnets | map(attribute='id') | list }}"
     subnet_database_ids: "{{ subnets_database_output.subnets | map(attribute='id') | list }}"
     subnet_storage_ids: "{{ subnets_storage_output.subnets | map(attribute='id') | list }}"
@@ -74,8 +74,8 @@
 - name: "Debug - Subnet IDs"
   ansible.builtin.debug:
     msg:
-     - "Compute Subnet IDs: {{ subnet_compute_ids }}"
-     - "Database Subnet IDs: {{ subnet_database_ids }}"
-     - "Storage Subnet IDs: {{ subnet_storage_ids }}"
-     - "Public Subnet IDs: {{ subnet_public_ids }}"
+      - "Compute Subnet IDs: {{ subnet_compute_ids }}"
+      - "Database Subnet IDs: {{ subnet_database_ids }}"
+      - "Storage Subnet IDs: {{ subnet_storage_ids }}"
+      - "Public Subnet IDs: {{ subnet_public_ids }}"
   when: debug_output

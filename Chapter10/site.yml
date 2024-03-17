@@ -11,7 +11,7 @@
     - group_vars/common.yml
 
   roles:
-    - roles/vpc
-    - roles/subnets
-    - roles/gateway
-    - roles/securitygroups
+    - "vpc"
+    - "subnets"
+    - "gateway"
+    - "securitygroups"

@@ -6,7 +6,7 @@
   register: public_ip_output
 
 - name: "Debug: IPify Public IP"
-  debug:
+  ansible.builtin.debug:
     var: "public_ip_output"
   when: debug_output
 
@@ -32,7 +32,7 @@
   register: base_security_groups_output
 
 - name: "Debug: Base Security Groups"
-  debug:
+  ansible.builtin.debug:
     var: "base_security_groups_output"
   when: debug_output
 
@@ -41,9 +41,11 @@
     "{{ item.id_var_name }}": "{{ base_security_groups_output.results | selectattr('item.name', 'equalto', item.name) | map(attribute='group_id') | first }}"
   loop: "{{ security_groups }}"
   when: base_security_groups_output.results | selectattr('item.name', 'equalto', item.name) | map(attribute='group_id') | list | length > 0
+  tags:
+    - "skip_ansible_lint"
 
 - name: "Debug: Print the security group ids"
-  debug:
+  ansible.builtin.debug:
     var: "{{ item.id_var_name }}"
   loop: "{{ security_groups }}"
 
@@ -60,6 +62,6 @@
   register: security_groups_with_rules_output
 
 - name: "Debug: Security Groups with Rules"
-  debug:
+  ansible.builtin.debug:
     var: "security_groups_with_rules_output"
   when: debug_output

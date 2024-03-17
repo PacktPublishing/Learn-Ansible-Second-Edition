@@ -16,7 +16,7 @@
   register: internet_gateway_output
 
 - name: "Debug: Internet Gateway Output"
-  debug:
+  ansible.builtin.debug:
     var: "internet_gateway_output"
   when: debug_output
 
@@ -39,6 +39,6 @@
   register: internet_gateway_route_output
 
 - name: "Debug: Internet Gateway Route Output"
-  debug:
+  ansible.builtin.debug:
     var: "internet_gateway_route_output"
   when: debug_output
