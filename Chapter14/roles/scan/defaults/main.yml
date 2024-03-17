@@ -27,7 +27,7 @@ scan:
       remote_folder: "/tmp/{{ common_scan_settings.dict.wpscan }}/"
       local_folder: "{{ common_scan_settings.local_folder }}"
       file: "{{ common_scan_settings.report_name }}{{ common_scan_settings.dict.wpscan }}.txt"
-  - name: "{{ common_scan_settings.dict.zap}}"
+  - name: "{{ common_scan_settings.dict.zap }}"
     image: "ghcr.io/zaproxy/zaproxy:stable"
     source: "{{ common_scan_settings.source }}"
     detach: "{{ common_scan_settings.detach }}"

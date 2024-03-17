@@ -1,7 +1,7 @@
 ---
 # tasks file for roles/scan
 
-- name: "pull the Docker image for the scanning tool"
+- name: "Pull the Docker image for the scanning tool"
   community.docker.docker_image:
     name: "{{ item.image }}"
     source: "{{ item.source }}"
@@ -10,8 +10,8 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: "create the folder which we will mount inside the container"
-  file:
+- name: "Create the folder which we will mount inside the container"
+  ansible.builtin.file:
     path: "{{ item.log.remote_folder }}"
     state: "directory"
     mode: "0777"
@@ -20,7 +20,7 @@
   loop_control:
     label: "{{ item.name }}"
 
-- name: "run the scan"
+- name: "Run the scan"
   community.docker.docker_container:
     detach: "{{ item.detach }}"
     auto_remove: "{{ item.auto_remove }}"
@@ -39,21 +39,22 @@
 - name: "Debug: docker_scan"
   ansible.builtin.debug:
     var: docker_scan
-  when: 
+  when:
     - debug
     - docker_scan.failed
 
-- name: "download the report"
+- name: "Download the report"
   ansible.builtin.fetch:
     src: "{{ item.log.remote_folder }}{{ item.log.file }}"
     dest: "{{ item.log.local_folder }}"
     flat: true
+    mode: "0644"
   loop: "{{ scan }}"
   when: "item.name in scan_types"
   loop_control:
     label: "{{ item.name }}"
 
-- name: "remove the scan container"
+- name: "Remove the scan container"
   community.docker.docker_container:
     name: "{{ item.name }}"
     state: "absent"

@@ -22,7 +22,7 @@ openscap_download:
     - "*.cfg"
 
 openscap_scan:
-  ssg_file_name: "{{openscap_download.dest}}/ssg-{{ ansible_facts.distribution | lower }}{{ ansible_facts.distribution_version | replace('.','') }}-ds.xml"
+  ssg_file_name: "{{ openscap_download.dest }}/ssg-{{ ansible_facts.distribution | lower }}{{ ansible_facts.distribution_version | replace('.', '') }}-ds.xml"
   profile_search: "cis_level1_server"
   output_dir: "/tmp/"
   output_file_xml: "{{ inventory_hostname }}-result.xml"

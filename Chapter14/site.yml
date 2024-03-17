@@ -1,16 +1,18 @@
 ---
-- hosts: ansible_hosts
+
+- name: "Scan our WordPress Ansible Playbook and stack"
+  hosts: ansible_hosts
   gather_facts: true
   become: true
-  become_method: sudo
+  become_method: "ansible.builtin.sudo"
   vars_files:
     - 'group_vars/common.yml'
 
   roles:
-    - { role: 'common', tags: ['openscap','scan'] }
-    - { role: 'docker', tags: ['docker','scan'] }
-    - { role: '../Chapter05/roles/stack-install', tags: ['wordpress'] }
-    - { role: '../Chapter05/roles/stack-config', tags: ['wordpress'] }
-    - { role: '../Chapter05/roles/wordpress', tags: ['wordpress'] }
+    - { role: 'common', tags: ['openscap', 'scan'] }
+    - { role: 'docker', tags: ['docker', 'scan'] }
+    - { role: 'stack_install', tags: ['wordpress'] }
+    - { role: 'stack_config', tags: ['wordpress'] }
+    - { role: 'wordpress', tags: ['wordpress'] }
     - { role: 'scan', tags: ['scan'] }
     - { role: 'openscap', tags: ['openscap'] }
