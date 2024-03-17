@@ -1,7 +1,7 @@
 ---
 # tasks file for roles/ec2ami
 
-- name: "find out some facts about the instance we have been using"
+- name: "Find out some facts about the instance we have been using"
   amazon.aws.ec2_instance_info:
     region: "{{ region }}"
     filters:
@@ -9,11 +9,11 @@
   register: our_instance
 
 - name: "Debug: show the instance facts"
-  debug:
+  ansible.builtin.debug:
     var: "our_instance"
   when: debug_output
 
-- name: "create the AMI"
+- name: "Create the AMI"
   amazon.aws.ec2_ami:
     region: "{{ region }}"
     state: "{{ state }}"
@@ -27,15 +27,15 @@
       "environment": "{{ app.env }}"
       "deployedBy": "{{ playbook_dict.deployedBy }}"
       "description": "{{ playbook_dict.ansible_warning }}"
-      "role": "{{ playbook_dict.ami }}"      
+      "role": "{{ playbook_dict.ami }}"
   register: ami_output
 
 - name: "Debug: show the AMI output"
-  debug:
+  ansible.builtin.debug:
     var: "ami_output"
   when: debug_output
 
-- name: "remove any temporary  instances which are running"
+- name: "Remove any temporary  instances which are running"
   amazon.aws.ec2_instance:
     region: "{{ region }}"
     state: "absent"
@@ -46,6 +46,6 @@
       "tag:Role": "tmp"
       "tag:Project": "{{ app.name }}"
 
-- name: "wait for 2 minutes before continuing"
+- name: "Wait for 2 minutes before continuing"
   ansible.builtin.pause:
     minutes: 2

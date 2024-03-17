@@ -10,12 +10,12 @@
       virtualization-type: "{{ ec2.ami.filters.virtualization_type }}"
   register: ubuntu_ami_info
 
-- name: filter the list of AMIs to find the latest one
-  set_fact:
+- name: "Filter the list of AMIs to find the latest one"
+  ansible.builtin.set_fact:
     ami: "{{ ubuntu_ami_info.images | sort(attribute='creation_date') | last }}"
 
 - name: "Debug: AMI ID"
-  debug:
+  ansible.builtin.debug:
     msg: "AMI ID: {{ ami.image_id }}"
   when: debug_output
 
@@ -35,18 +35,18 @@
   register: keypair_output
 
 - name: "Debug: Key Pair"
-  debug:
+  ansible.builtin.debug:
     var: "keypair_output"
   when: debug_output
 
 - name: "Extract EC2 Group ID"
-  set_fact:
+  ansible.builtin.set_fact:
     ec2_group_id: "{{ item.group_id }}"
   loop: "{{ security_groups_with_rules_output.results }}"
-  when: item.group_name is search("{{ ec2_seach_string }}")
+  when: item.group_name is search(ec2_seach_string)
 
 - name: "Debug: RDS Security Group Output"
-  debug:
+  ansible.builtin.debug:
     var: ec2_group_id
   when: debug_output
 
@@ -72,7 +72,7 @@
   register: ec2_tmp_instance_output
 
 - name: "Debug: EC2 Instance Output"
-  debug:
+  ansible.builtin.debug:
     var: ec2_tmp_instance_output
   when: debug_output
 

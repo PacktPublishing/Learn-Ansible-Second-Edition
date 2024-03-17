@@ -21,18 +21,18 @@
   register: elb_target_group_output
 
 - name: "Debug: ELB Target Group Output"
-  debug:
+  ansible.builtin.debug:
     var: "elb_target_group_output"
   when: debug_output
 
 - name: Extract ELB Group ID
-  set_fact:
+  ansible.builtin.set_fact:
     elb_group_id: "{{ item.group_id }}"
   loop: "{{ security_groups_with_rules_output.results }}"
-  when: item.group_name is search("{{ elb_seach_string }}")
+  when: item.group_name is search(elb_seach_string)
 
 - name: "Debug: ELB Target Group Output"
-  debug:
+  ansible.builtin.debug:
     var: elb_group_id
   when: debug_output
 
@@ -44,10 +44,10 @@
     security_groups: "{{ elb_group_id }}"
     subnets: "{{ subnet_public_ids }}"
     listeners:
-      - Protocol: "HTTP" 
+      - Protocol: "HTTP"
         Port: "80"
         DefaultActions:
-          - Type: "forward" 
+          - Type: "forward"
             TargetGroupArn: "{{ elb_target_group_output.target_group_arn }}"
     tags:
       "Name": "{{ elb_name }}"
@@ -59,6 +59,6 @@
   register: loadbalancer_output
 
 - name: "Debug: ELB Output"
-  debug:
+  ansible.builtin.debug:
     var: "loadbalancer_output"
   when: debug_output

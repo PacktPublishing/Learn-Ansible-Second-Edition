@@ -18,18 +18,18 @@
   register: rds_subnet_group_output
 
 - name: "Debug: RDS subnet group"
-  debug:
+  ansible.builtin.debug:
     var: rds_subnet_group_output
   when: debug_output
 
 - name: "Extract RDS Group ID"
-  set_fact:
+  ansible.builtin.set_fact:
     rds_group_id: "{{ item.group_id }}"
   loop: "{{ security_groups_with_rules_output.results }}"
   when: item.group_name is search('rds_seach_string')
 
 - name: "Debug: RDS Security Group Output"
-  debug:
+  ansible.builtin.debug:
     var: rds_group_id
   when: debug_output
 
@@ -42,7 +42,7 @@
     engine: "{{ rds.engine }}"
     engine_version: "{{ rds.engine_version }}"
     allocated_storage: "{{ rds.allocated_storage }}"
-    username: "{{ rds.db_username  }}"
+    username: "{{ rds.db_username }}"
     password: "{{ rds.db_password }}"
     db_name: "{{ rds.db_name }}"
     db_subnet_group_name: "{{ rds_subnet_group_output.subnet_group.name }}"
@@ -57,6 +57,6 @@
   register: rds_instance_output
 
 - name: "Debug: RDS Instance Output"
-  debug:
+  ansible.builtin.debug:
     var: rds_instance_output
   when: debug_output

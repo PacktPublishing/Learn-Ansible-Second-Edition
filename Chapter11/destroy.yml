@@ -12,9 +12,8 @@
     - group_vars/common.yml
 
   tasks:
-
     - name: "Delete the Auto Scaling Group"
-      community.aws.ec2_asg:
+      amazon.aws.autoscaling_group:
         region: "{{ region }}"
         state: "{{ state }}"
         name: "{{ asg_name }}"
@@ -34,7 +33,7 @@
           "tag:deployedBy": "{{ playbook_dict.deployedBy }}"
           "tag:description": "{{ playbook_dict.ansible_warning }}"
       register: amis_to_delete
-  
+
     - name: "Delete the AMI(s)"
       amazon.aws.ec2_ami:
         region: "{{ region }}"
@@ -50,9 +49,10 @@
         name: "{{ ec2.keypair.name }}"
 
     - name: "Delete the group_vars/generated_aws_endpoints.yml file"
-      file:
+      ansible.builtin.file:
         path: "group_vars/generated_aws_endpoints.yml"
         state: "{{ state }}"
+        mode: "0644"
 
     - name: "Delete the RDS database"
       amazon.aws.rds_instance:
@@ -68,9 +68,10 @@
         state: "{{ state }}"
 
     - name: "Delete the group_vars/generated_rds_passwordfile file"
-      file:
+      ansible.builtin.file:
         path: "group_vars/generated_rds_passwordfile"
         state: "{{ state }}"
+        mode: "0644"
 
     - name: "Delete the EFS File System"
       community.aws.efs:
@@ -79,9 +80,10 @@
         state: "{{ state }}"
 
     - name: "Delete the group_vars/generated_efs_targets.yml file"
-      file:
+      ansible.builtin.file:
         path: "group_vars/generated_efs_targets.yml"
         state: "{{ state }}"
+        mode: "0644"
 
     - name: "Delete the application elastic load balancer"
       amazon.aws.elb_application_lb:
@@ -96,7 +98,7 @@
         state: "{{ state }}"
 
     - name: "Create a reversed list of the security group names"
-      set_fact:
+      ansible.builtin.set_fact:
         security_groups_names_reversed: "{{ security_groups | map(attribute='name') | list | reverse }}"
 
     - name: "Delete the security groups"
@@ -113,14 +115,14 @@
     - name: "Get information about the VPC"
       amazon.aws.ec2_vpc_net_info:
         region: "{{ region }}"
-        filters: 
+        filters:
           "tag:Name": "{{ vpc_name }}"
       register: the_vpc
 
     - name: "Get information about the Route Table"
       amazon.aws.ec2_vpc_route_table_info:
         region: "{{ region }}"
-        filters: 
+        filters:
           "vpc-id": "{{ the_vpc.vpcs[0].id }}"
       register: the_route_tables
       when: the_vpc.vpcs | length > 0
@@ -132,7 +134,7 @@
         region: "{{ region }}"
         lookup: "id"
         state: "{{ state }}"
-      when: the_vpc.vpcs | length > 0 and item.associations[0].main != true
+      when: the_vpc.vpcs | length > 0 and not item.associations[0].main
       with_items: "{{ the_route_tables.route_tables }}"
 
     - name: "Delete the Internet Gateway"
@@ -145,7 +147,7 @@
     - name: "Get information on the subnets"
       amazon.aws.ec2_vpc_subnet_info:
         region: "{{ region }}"
-        filters: 
+        filters:
           "vpc-id": "{{ the_vpc.vpcs[0].id }}"
       register: the_subnets
       when: the_vpc.vpcs | length > 0
