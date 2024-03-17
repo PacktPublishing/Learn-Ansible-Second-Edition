@@ -1,6 +1,29 @@
 ---
 # tasks file for roles/stack-config
 
+# EFS configuration tasks
+
+- name: "Check that the EFS volume is ready"
+  ansible.builtin.wait_for:
+    host: "{{ aws_endpoints.efs }}"
+    port: "2049"
+    delay: 10
+    timeout: 300
+
+- name: "Ensure rpcbind service is running"
+  ansible.builtin.service:
+    name: "rpcbind"
+    state: "started"
+    enabled: true
+
+- name: "Mount the EFS volume"
+  ansible.posix.mount:
+    src: "{{ aws_endpoints.efs }}:/"
+    path: "{{ nfs.mount_point }}"
+    opts: "{{ nfs.mount_options }}"
+    state: "{{ nfs.state }}"
+    fstype: "{{ nfs.fstype }}"
+
 # WordPress system user tasks
 
 - name: "Add the wordpress group"
