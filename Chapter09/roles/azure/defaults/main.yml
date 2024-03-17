@@ -18,13 +18,13 @@ dict:
 # Resource names
 ##################################################
 
-load_balancer_name: "{{ dict.load_balancer }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+load_balancer_name: "{{ dict.load_balancer }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
 load_balancer_public_ip_name: "{{ dict.public_ip }}-{{ load_balancer_name }}"
-nsg_name: "{{ dict.nsg }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-virtual_network_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-vm_name: "{{ dict.virtual_machine }}-admin-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
-vnet_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+nsg_name: "{{ dict.nsg }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+virtual_network_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+vm_name: "{{ dict.virtual_machine }}-admin-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+vnet_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
 
 # Virtual network
 ##################################################
@@ -33,11 +33,11 @@ vnet_config:
   cidr_block: "10.0.0.0/24"
   subnets:
     - {
-        name: "{{ dict.subnet }}-vms-{{ app.name }}-{{app.env}}-{{ app.location_short }}",
-        subnet: "10.0.0.0/27",
-        private: true,
-        service_endpoints: "Microsoft.Storage",
-      }
+      name: "{{ dict.subnet }}-vms-{{ app.name }}-{{ app.env }}-{{ app.location_short }}",
+      subnet: "10.0.0.0/27",
+      private: true,
+      service_endpoints: "Microsoft.Storage",
+    }
 
 trusted_ips:
   - ""
@@ -58,7 +58,7 @@ nsg_rules:
     description: "{{ dict.ansible_warning }}"
     protocol: "Tcp"
     destination_port_range: "{{ load_balancer.ssh_port }}"
-    source_address_prefix: "{{ trusted_ips|select() + dynamic_ips | unique }}"
+    source_address_prefix: "{{ trusted_ips | select() + dynamic_ips | unique }}"
     access: "Allow"
     priority: "150"
     direction: "Inbound"
@@ -84,7 +84,7 @@ vm_config:
   disk:
     managed_disk_type: "Premium_LRS"
     caching: "ReadWrite"
-  key:  
+  key:
     path: "/home/adminuser/.ssh/authorized_keys"
     data: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 

@@ -38,7 +38,7 @@
   register: "subnet_output"
 
 - name: "Debug - Subnets result"
-  debug:
+  ansible.builtin.debug:
     var: "subnet_output"
   when: debug_output
 
@@ -47,9 +47,9 @@
   register: public_ip_output
 
 - name: "Debug - Public IP result"
-  debug:
+  ansible.builtin.debug:
     var: "public_ip_output"
-  when: debug_output == true
+  when: debug_output
 
 - name: "Register your public ip as a fact"
   ansible.builtin.set_fact:
@@ -66,7 +66,7 @@
 - name: "Debug - Network Security Group result"
   ansible.builtin.debug:
     var: "nsg_output"
-  when: debug_output == true
+  when: debug_output
 
 - name: "Create the public IP address needed for the load balancer"
   azure.azcollection.azure_rm_publicipaddress:
@@ -79,7 +79,7 @@
   register: "public_ip_output"
 
 - name: "Debug - Public IP result"
-  debug:
+  ansible.builtin.debug:
     var: "public_ip_output"
   when: debug_output
 
@@ -117,8 +117,8 @@
 - name: "Debug - Load Balancer result"
   ansible.builtin.debug:
     var: "load_balancer_output"
-  when: debug_output == true
-           
+  when: debug_output
+
 - name: "Create the network interface for the wordpress vm"
   azure.azcollection.azure_rm_resource:
     api_version: "2023-05-01"
@@ -129,20 +129,20 @@
     resource_name: "{{ dict.network_interface }}-{{ vm_name }}"
     body:
       location: "{{ location }}"
-      properties: 
+      properties:
         enableAcceleratedNetworking: false
         primary: true
         networksecuritygroup:
           id: "{{ nsg_output.state.id }}"
-        ipConfigurations: 
+        ipConfigurations:
           - name: "{{ vm_name }}-ipcfg"
-            properties: 
-              subnet: 
+            properties:
+              subnet:
                 id: "{{ subnet_output.results[0].state.id }}"
               loadBalancerBackendAddressPools:
-                - id: "{{ load_balancer_output.state.backend_address_pools[0].id }}" 
+                - id: "{{ load_balancer_output.state.backend_address_pools[0].id }}"
               loadBalancerInboundNatRules:
-                - id: "{{ load_balancer_output.state.inbound_nat_rules[0].id }}" 
+                - id: "{{ load_balancer_output.state.inbound_nat_rules[0].id }}"
       tags: "{{ common_tags }}"
   register: "network_interface_output"
 
@@ -151,14 +151,14 @@
     var: "network_interface_output"
   when: debug_output
 
-- name: "check the user {{ ansible_user_id }} has a key, if not create one"
+- name: "Check user has a key, if not create one for {{ ansible_user_id }}"
   ansible.builtin.user:
     name: "{{ ansible_user_id }}"
     generate_ssh_key: "yes"
     ssh_key_file: "~/.ssh/id_rsa"
   when: genterate_key
 
-- name: Create the admin virtual machine
+- name: "Create the admin virtual machine"
   azure.azcollection.azure_rm_virtualmachine:
     resource_group: "{{ resource_group_output.state.name }}"
     name: "{{ vm_name }}"
