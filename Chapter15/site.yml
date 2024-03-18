@@ -4,24 +4,22 @@
   hosts: localhost
   connection: local
   gather_facts: true
-
   vars_files:
     - group_vars/common.yml
 
   roles:
-    - roles/azure
+    - "azure"
 
 - name: "Install and configure Wordpress"
   hosts: vmgroup
   gather_facts: true
   become: true
-  become_method: sudo
-
+  become_method: "ansible.builtin.sudo"
   vars_files:
     - group_vars/common.yml
 
   roles:
-    - roles/secrets
-    - roles/stack-install
-    - roles/stack-config
-    - roles/wordpress
+    - "secrets"
+    - "stack_install"
+    - "stack_config"
+    - "wordpress"

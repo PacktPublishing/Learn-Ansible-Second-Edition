@@ -13,12 +13,9 @@ php:
   port: "9000"
   upstream: "php"
   ini:
-    - { regexp: "^;date.timezone =", replace: "date.timezone = Europe/London" }
-    - { regexp: "^expose_php = On", replace: "expose_php = Off" }
-    - {
-        regexp: "^upload_max_filesize = 2M",
-        replace: "upload_max_filesize = 20M",
-      }
+    - { regexp: ^;date.timezone =, replace: date.timezone = Europe/London }
+    - { regexp: ^expose_php = On, replace: expose_php = Off }
+    - { regexp: ^upload_max_filesize = 2M, replace: upload_max_filesize = 20M }
 
 php_fpm_path: "/etc/php/8.1/fpm/pool.d/www.conf"
 php_ini_path: "/etc/php/8.1/fpm/php.ini"
@@ -28,7 +25,7 @@ mariadb:
   bind: "127.0.0.1"
   server_config: "/etc/my.cnf.d/mariadb-server.cnf"
   username: "root"
-  password: "{{ db_password }}"
+  password: "Pa55W0rd123"
   hosts:
     - "127.0.0.1"
     - "::1"
