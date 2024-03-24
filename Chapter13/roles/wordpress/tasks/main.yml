@@ -10,6 +10,7 @@
 
 - name: "Download wp-cli"
   ansible.builtin.get_url:
+    # checkov:skip=CKV2_ANSIBLE_2:"The URL passed in the variable is secured with SSL/TLS protocol."
     url: "{{ wp_cli.download }}"
     dest: "{{ wp_cli.path }}"
     mode: "0755"

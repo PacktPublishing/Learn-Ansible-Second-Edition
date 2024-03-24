@@ -52,6 +52,8 @@
 
 - name: "Create the temporary ec2 instance"
   amazon.aws.ec2_instance:
+    # checkov:skip=CKV_AWS_88:"While a public IP address is assigned to the instance, it is locked down by the security group and the instance is temporary."
+    ebs_optimized: true
     name: "{{ ec2_tmp_name }}"
     region: "{{ region }}"
     state: "{{ state }}"
