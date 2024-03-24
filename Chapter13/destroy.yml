@@ -52,7 +52,6 @@
       ansible.builtin.file:
         path: "group_vars/generated_aws_endpoints.yml"
         state: "{{ state }}"
-        mode: "0644"
 
     - name: "Delete the RDS database"
       amazon.aws.rds_instance:
@@ -71,7 +70,6 @@
       ansible.builtin.file:
         path: "group_vars/generated_rds_passwordfile"
         state: "{{ state }}"
-        mode: "0644"
 
     - name: "Delete the EFS File System"
       community.aws.efs:
@@ -83,7 +81,6 @@
       ansible.builtin.file:
         path: "group_vars/generated_efs_targets.yml"
         state: "{{ state }}"
-        mode: "0644"
 
     - name: "Delete the application elastic load balancer"
       amazon.aws.elb_application_lb:

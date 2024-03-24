@@ -16,7 +16,6 @@
   ansible.builtin.template:
     src: "targets.j2"
     dest: "group_vars/generated_efs_targets.yml"
-    mode: "0644"
 
 - name: "Include the efs targets vars file"
   ansible.builtin.include_vars: "group_vars/generated_efs_targets.yml"
