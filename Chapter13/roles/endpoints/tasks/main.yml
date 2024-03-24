@@ -1,0 +1,8 @@
+---
+# tasks file for roles/endpoints
+
+- name: "Generate the aws endpoints file"
+  ansible.builtin.template:
+    src: "endponts.j2"
+    dest: "group_vars/generated_aws_endpoints.yml"
+    mode: "0644"

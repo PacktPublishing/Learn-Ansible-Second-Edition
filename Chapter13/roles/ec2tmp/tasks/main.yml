@@ -1,0 +1,100 @@
+---
+# tasks file for roles/ec2tmp
+
+- name: "Gather information about AMIs with the specified filters"
+  amazon.aws.ec2_ami_info:
+    region: "{{ region }}"
+    owners: "{{ ec2.ami.owners }}"
+    filters:
+      name: "{{ ec2.ami.filters.name }}"
+      virtualization-type: "{{ ec2.ami.filters.virtualization_type }}"
+  register: ubuntu_ami_info
+
+- name: "Filter the list of AMIs to find the latest one"
+  ansible.builtin.set_fact:
+    ami: "{{ ubuntu_ami_info.images | sort(attribute='creation_date') | last }}"
+
+- name: "Debug: AMI ID"
+  ansible.builtin.debug:
+    msg: "AMI ID: {{ ami.image_id }}"
+  when: debug_output
+
+- name: "Create a SSH Key Pair"
+  amazon.aws.ec2_key:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ ec2.keypair.name }}"
+    key_material: "{{ ec2.keypair.key_material }}"
+    tags:
+      "Name": "{{ ec2.keypair.name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "ssh_keypair"
+  register: keypair_output
+
+- name: "Debug: Key Pair"
+  ansible.builtin.debug:
+    var: "keypair_output"
+  when: debug_output
+
+- name: "Extract EC2 Group ID"
+  ansible.builtin.set_fact:
+    ec2_group_id: "{{ item.group_id }}"
+  loop: "{{ security_groups_with_rules_output.results }}"
+  when: item.group_name is search(ec2_seach_string)
+
+- name: "Debug: RDS Security Group Output"
+  ansible.builtin.debug:
+    var: ec2_group_id
+  when: debug_output
+
+- name: "Create the temporary ec2 instance"
+  amazon.aws.ec2_instance:
+    name: "{{ ec2_tmp_name }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_subnet_id: "{{ subnet_compute_ids[0] }}"
+    instance_type: "{{ ec2.instance_type }}"
+    security_group: "{{ ec2_group_id }}"
+    key_name: "{{ ec2.keypair.name }}"
+    network:
+      assign_public_ip: "{{ ec2.public_ip }}"
+    image_id: "{{ ami.image_id }}"
+    tags:
+      Name: "{{ ec2_tmp_name }}"
+      Description: "{{ dict.ansible_warning }}"
+      Project: "{{ app.name }}"
+      Environment: "{{ app.env }}"
+      Deployed_by: "Ansible"
+      Role: "tmp"
+  register: ec2_tmp_instance_output
+
+- name: "Debug: EC2 Instance Output"
+  ansible.builtin.debug:
+    var: ec2_tmp_instance_output
+  when: debug_output
+
+- name: "Get information about the temporary EC2 instance to see if it is running"
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      instance-id: "{{ ec2_tmp_instance_output.instances[0].instance_id }}"
+  register: ec2_tmp_instance_state
+  delay: 5
+  retries: 50
+  until: ec2_tmp_instance_state.instances[0].state.name == "running"
+
+- name: "Add the temporary EC2 instance to the vmgroup"
+  ansible.builtin.add_host:
+    name: "{{ ec2_tmp_instance_output.instances[0].public_dns_name }}"
+    ansible_ssh_host: "{{ ec2_tmp_instance_output.instances[0].public_ip_address }}"
+    groups: "vmgroup"
+
+- name: "Wait for the temporary EC2 instance to be ready to accept SSH connections"
+  ansible.builtin.wait_for:
+    host: "{{ ec2_tmp_instance_output.instances[0].public_ip_address }}"
+    port: "{{ ec2.ssh_port }}"
+    delay: 10
+    timeout: 300

@@ -1,0 +1,51 @@
+---
+# tasks file for roles/ec2ami
+
+- name: "Find out some facts about the instance we have been using"
+  amazon.aws.ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      dns-name: "{{ groups['vmgroup'] }}"
+  register: our_instance
+
+- name: "Debug: show the instance facts"
+  ansible.builtin.debug:
+    var: "our_instance"
+  when: debug_output
+
+- name: "Create the AMI"
+  amazon.aws.ec2_ami:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    instance_id: "{{ our_instance.instances[0].instance_id }}"
+    wait: "yes"
+    name: "{{ ami_name }}-{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+    tags:
+      "Name": "{{ ami_name }}-{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
+      "buildDate": "{{ ansible_date_time.date }} {{ ansible_date_time.time }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "{{ playbook_dict.ami }}"
+  register: ami_output
+
+- name: "Debug: show the AMI output"
+  ansible.builtin.debug:
+    var: "ami_output"
+  when: debug_output
+
+- name: "Remove any temporary  instances which are running"
+  amazon.aws.ec2_instance:
+    region: "{{ region }}"
+    state: "absent"
+    name: "{{ ec2_tmp_name }}"
+    filters:
+      instance-state-name: "running"
+      "tag:Name": "{{ ec2_tmp_name }}"
+      "tag:Role": "tmp"
+      "tag:Project": "{{ app.name }}"
+
+- name: "Wait for 2 minutes before continuing"
+  ansible.builtin.pause:
+    minutes: 2

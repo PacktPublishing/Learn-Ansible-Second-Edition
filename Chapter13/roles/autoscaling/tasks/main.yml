@@ -1,0 +1,127 @@
+---
+# tasks file for roles/autoscaling
+
+- name: "Search for all of our AMIs"
+  amazon.aws.ec2_ami_info:
+    region: "{{ region }}"
+    filters:
+      name: "{{ ami_name }}-*"
+  register: ami_find
+
+- name: "Find the last one we built"
+  ansible.builtin.set_fact:
+    ami_sort_filter: "{{ ami_find.images | sort(attribute='creation_date') | last }}"
+
+- name: "Grab AMI ID and name of the most recent result"
+  ansible.builtin.set_fact:
+    our_ami_id: "{{ ami_sort_filter.image_id }}"
+    our_ami_name: "{{ ami_sort_filter.name }}"
+
+- name: "Debug: AMI ID"
+  ansible.builtin.debug:
+    msg: |
+      "{{ our_ami_id }}
+      "{{ our_ami_name }}"
+  when: debug_output
+
+- name: "Get information on the ec2 security group"
+  amazon.aws.ec2_security_group_info:
+    region: "{{ region }}"
+    filters:
+      group-name: "*{{ ec2_seach_string }}*"
+  register: ec2_group_id
+
+- name: "Debug: EC2 Security Group Info"
+  ansible.builtin.debug:
+    var: ec2_group_id
+  when: debug_output
+
+- name: "Create the launch template"
+  community.aws.ec2_launch_template:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ launch_template_name }}"
+    version_description: "{{ our_ami_name }}"
+    image_id: "{{ our_ami_id }}"
+    security_group_ids: ["{{ ec2_group_id.security_groups[0].group_id }}"]
+    instance_type: "{{ ec2.instance_type }}"
+    disable_api_termination: "{{ ec2.asg.disable_api_termination }}"
+    tags:
+      "Name": "{{ ec2_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "launchTemplate"
+
+- name: "Find out the target group ARN"
+  community.aws.elb_target_group_info:
+    region: "{{ region }}"
+    names:
+      - "{{ elb_target_group_name }}"
+  register: elb_target_group_output
+
+- name: "Debug: Target Group ARN"
+  ansible.builtin.debug:
+    var: elb_target_group_output
+  when: debug_output
+
+- name: "Get information on the ec2 subnets"
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ region }}"
+    filters:
+      tag:role: "*{{ subnet_role_compute }}*"
+  register: ec2_subnet_output
+
+- name: "Debug: EC2 Subnet Info"
+  ansible.builtin.debug:
+    var: ec2_subnet_output
+  when: debug_output
+
+- name: "Create a list of subnet IDs"
+  ansible.builtin.set_fact:
+    subnet_ec2_ids: "{{ subnet_ec2_ids | default([]) + [item.subnet_id] }}"
+  loop: "{{ ec2_subnet_output.subnets }}"
+
+- name: "Debug: EC2 Subnet IDs"
+  ansible.builtin.debug:
+    var: subnet_ec2_ids
+  when: debug_output
+
+- name: "Create/update the auto-scaling group using the launch template we just created"
+  amazon.aws.autoscaling_group:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    name: "{{ asg_name }}"
+    target_group_arns: ["{{ elb_target_group_output.target_groups[0].target_group_arn }}"]
+    launch_template:
+      launch_template_name: "{{ launch_template_name }}"
+    min_size: "{{ ec2.asg.min_size }}"
+    max_size: "{{ ec2.asg.max_size }}"
+    desired_capacity: "{{ ec2.asg.desired_capacity }}"
+    health_check_period: "{{ ec2.asg.health_check_period }}"
+    health_check_type: "{{ ec2.asg.health_check_type }}"
+    replace_all_instances: "{{ ec2.asg.replace_all_instances }}"
+    replace_batch_size: "{{ ec2.asg.replace_batch_size }}"
+    vpc_zone_identifier: "{{ subnet_ec2_ids }}"
+    wait_for_instances: "{{ ec2.asg.wait_for_instances }}"
+    wait_timeout: "{{ ec2.asg.wait_timeout }}"
+    tags:
+      - key: "Name"
+        value: "{{ ec2_name }}"
+        propagate_at_launch: true
+      - key: "Project"
+        value: "{{ app.name }}"
+        propagate_at_launch: true
+      - key: "Environment"
+        value: "{{ app.env }}"
+        propagate_at_launch: true
+      - key: "Deployed_by"
+        value: "Ansible"
+        propagate_at_launch: true
+  register: ec2_asg_output
+
+- name: "Debug: Auto Scaling Group Output"
+  ansible.builtin.debug:
+    var: ec2_asg_output
+  when: debug_output

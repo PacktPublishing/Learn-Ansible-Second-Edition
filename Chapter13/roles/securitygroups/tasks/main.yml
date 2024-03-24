@@ -1,0 +1,67 @@
+---
+# tasks file for roles/securitygroups
+
+- name: "Find out your current public IP address using https://ipify.org/"
+  community.general.ipify_facts:
+  register: public_ip_output
+
+- name: "Debug: IPify Public IP"
+  ansible.builtin.debug:
+    var: "public_ip_output"
+  when: debug_output
+
+- name: "Set your public ip as a fact"
+  ansible.builtin.set_fact:
+    your_public_ip: "{{ public_ip_output.ansible_facts.ipify_public_ip }}/32"
+
+- name: "Create the base security groups"
+  amazon.aws.ec2_security_group:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    purge_rules: false
+    tags:
+      "Name": "{{ item.name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "role": "securitygroup"
+  loop: "{{ security_groups }}"
+  register: base_security_groups_output
+
+- name: "Debug: Base Security Groups"
+  ansible.builtin.debug:
+    var: "base_security_groups_output"
+  when: debug_output
+
+- name: "Set the fact for the security group ids"
+  ansible.builtin.set_fact:
+    "{{ item.id_var_name }}": "{{ base_security_groups_output.results | selectattr('item.name', 'equalto', item.name) | map(attribute='group_id') | first }}"
+  loop: "{{ security_groups }}"
+  when: base_security_groups_output.results | selectattr('item.name', 'equalto', item.name) | map(attribute='group_id') | list | length > 0
+  tags:
+    - "skip_ansible_lint"
+
+- name: "Debug: Print the security group ids"
+  ansible.builtin.debug:
+    var: "{{ item.id_var_name }}"
+  loop: "{{ security_groups }}"
+
+- name: "Provision security group rules"
+  amazon.aws.ec2_security_group:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    purge_rules: false
+    rules: "{{ item.rules }}"
+  loop: "{{ security_groups }}"
+  register: security_groups_with_rules_output
+
+- name: "Debug: Security Groups with Rules"
+  ansible.builtin.debug:
+    var: "security_groups_with_rules_output"
+  when: debug_output

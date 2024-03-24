@@ -1,0 +1,222 @@
+---
+# Application and Resource Configuration
+##################################################
+
+debug_output: false
+
+app:
+  name: "learnansible"
+  region: "eu-west-1"
+  env: "prod"
+
+wp_database:
+  name: "{{ rds.db_name }}"
+  username: "{{ rds.db_username }}"
+  password: "{{ rds.db_password }}"
+
+wordpress:
+  domain: "http://{{ aws_endpoints.elb }}/"
+  title: "WordPress installed by Ansible on {{ os_family }}"
+  username: "ansible"
+  password: "{{ rds.db_password }}"
+  email: "test@test.com"
+  plugins:
+    - "jetpack"
+    - "wp-super-cache"
+    - "wordpress-seo"
+    - "wordfence"
+    - "nginx-helper"
+
+# Stack Configuration
+##################################################
+
+stack_packages:
+  - "nginx"
+  - "mariadb-client"
+  - "php-cli"
+  - "php-curl"
+  - "php-fpm"
+  - "php-gd"
+  - "php-intl"
+  - "php-mbstring"
+  - "php-mysql"
+  - "php-soap"
+  - "php-xml"
+  - "php-xmlrpc"
+  - "php-zip"
+  - "nfs-common" # Added for AWS
+  - "nfs4-acl-tools" # Added for AWS
+  - "autofs"  # Added for AWS
+  - "rpcbind"  # Added for AWS
+
+nfs:
+  mount_point: "/var/www/"
+  mount_options: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2"
+  state: "mounted"
+  fstype: "nfs4"
+
+# Resource Names
+##################################################
+
+vpc_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.vpc }}"
+internet_gateway_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.internet_gateway }}"
+internet_gateway_route_name: "{{ internet_gateway_name }}-{{ playbook_dict.route }}"
+elb_target_group_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb_target_group }}"
+elb_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.elb }}"
+efs_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.efs }}"
+rds_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.rds }}"
+ec2_tmp_name: "{{ app.name }}-tmp-{{ playbook_dict.ec2 }}"
+ami_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ami }}"
+ec2_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.ec2 }}"
+launch_template_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.lt }}"
+asg_name: "{{ app.name }}-{{ app.env }}-{{ playbook_dict.asg }}"
+
+# EC2 Configuration
+##################################################
+
+ec2:
+  instance_type: "t2.micro"
+  public_ip: true
+  ssh_port: "22"
+  asg:
+    min_size: 1
+    max_size: 3
+    desired_capacity: 2
+    health_check_type: "EC2"
+    replace_batch_size: 1
+    health_check_period: 300
+    replace_all_instances: true
+    wait_for_instances: true
+    wait_timeout: 900
+    disable_api_termination: true
+  ami:
+    owners: "099720109477"
+    filters:
+      name: "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"
+      virtualization_type: "hvm"
+  keypair:
+    name: "ssh_keypair"
+    key_material: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# RDS Configuration
+##################################################
+
+rds:
+  db_username: "{{ app.name }}"
+  db_password: "{{ lookup('password', 'group_vars/generated_rds_passwordfile chars=ascii_letters,digits length=30') }}"
+  db_name: "{{ app.name }}"
+  instance_type: "db.t2.micro"
+  engine: "mysql"
+  engine_version: "8.0"
+  allocated_storage: "5"
+
+# EFS Configuration
+##################################################
+
+efs:
+  wait: "yes"
+  wait_time: "1200"
+
+# VPC and Subnets Configuration
+##################################################
+
+vpc:
+  cidr_block: "10.0.0.0/22" # This must be at least a /23 or larger for the subnets to be created
+  dns_hostnames: true
+  dns_support: true
+  subnet_size: "27"
+  subnets:
+    - name: "ec2"
+      role: "{{ subnet_role_compute }}"
+    - name: "rds"
+      role: "{{ subnet_role_database }}"
+    - name: "efs"
+      role: "{{ subnet_role_storage }}"
+    - name: "dmz"
+      role: "{{ subnet_role_public }}"
+
+subnet_role_compute: "compute"
+subnet_role_database: "database"
+subnet_role_storage: "storage"
+subnet_role_public: "public"
+
+# Security Group Configuration
+##################################################
+
+security_groups:
+  - name: "{{ app.name  }}-{{ elb_seach_string }}-{{ playbook_dict.security_group }}"
+    description: "opens port 80 and 443 to the world"
+    id_var_name: "elb_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "allow all on port 80"
+      - proto: "tcp"
+        from_port: "443"
+        to_port: "443"
+        cidr_ip: "0.0.0.0/0"
+        rule_desc: "allow all on port 443"
+  - name: "{{ app.name }}-{{ ec2_seach_string }}-{{ playbook_dict.security_group }}"
+    description: "opens port 22 to a trusted IP and port 80 to the elb group"
+    id_var_name: "ec2_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "{{ ec2.ssh_port }}"
+        to_port: "{{ ec2.ssh_port }}"
+        cidr_ip: "{{ your_public_ip }}"
+        rule_desc: "allow {{ your_public_ip }} access to port 22"
+      - proto: "tcp"
+        from_port: "80"
+        to_port: "80"
+        group_id: "{{ elb_group_id | default('') }}"
+        rule_desc: "allow access to port 80 from ELB"
+  - name: "{{ app.name }}-{{ rds_seach_string }}-{{ playbook_dict.security_group }}"
+    description: "opens port 3306 to the ec2 instances"
+    id_var_name: "rds_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "3306"
+        to_port: "3306"
+        group_id: "{{ ec2_group_id | default('') }}"
+        rule_desc: "allow {{ ec2_group_id | default('') }} access to port 3306"
+  - name: "{{ app.name }}-{{ efs_seach_string }}-{{ playbook_dict.security_group }}"
+    description: "opens port 2049 to the ec2 instances"
+    id_var_name: "efs_group_id"
+    rules:
+      - proto: "tcp"
+        from_port: "2049"
+        to_port: "2049"
+        group_id: "{{ ec2_group_id | default('') }}"
+        rule_desc: "allow {{ ec2_group_id | default('') }} access to port 2049"
+
+elb_seach_string: "elb"
+ec2_seach_string: "ec2"
+rds_seach_string: "rds"
+efs_seach_string: "efs"
+
+# Dictionary
+##################################################
+
+playbook_dict:
+  deployedBy: "Ansible"
+  ansible_warning: "Resource managed by Ansible"
+  vpc: "vpc"
+  subnet: "subnet"
+  internet_gateway: "internet-gateway"
+  route: "route"
+  security_group: "security-group"
+  elb_target_group: "target-group"
+  elb: "elb"
+  efs: "efs"
+  rds: "rds"
+  ec2: "ec2"
+  ami: "ami"
+  asg: "asg"
+  lt: "launch-template"
+
+# AWS Configuration, some defaults from other variables
+##################################################
+
+region: "{{ app.region }}"

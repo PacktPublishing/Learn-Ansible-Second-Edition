@@ -1,0 +1,46 @@
+---
+# tasks file for roles/efs
+
+- name: "Extract EFS Group ID"
+  ansible.builtin.set_fact:
+    efs_group_id: "{{ item.group_id }}"
+  loop: "{{ security_groups_with_rules_output.results }}"
+  when: item.group_name is search(efs_seach_string)
+
+- name: "Debug: ELB Target Group Output"
+  ansible.builtin.debug:
+    var: efs_group_id
+  when: debug_output
+
+- name: "Generate the efs targets vars file"
+  ansible.builtin.template:
+    src: "targets.j2"
+    dest: "group_vars/generated_efs_targets.yml"
+    mode: "0644"
+
+- name: "Include the efs targets vars file"
+  ansible.builtin.include_vars: "group_vars/generated_efs_targets.yml"
+
+- name: "Create the EFS File System"
+  community.aws.efs:
+    name: "{{ efs_name }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    tags:
+      "Name": "{{ efs_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "efs"
+    targets: "{{ efs_targets }}"
+    wait: "{{ efs.wait }}"
+    wait_timeout: "{{ efs.wait_time }}"
+  register: efs_output
+  tags:
+    - "skip_ansible_lint"
+
+- name: "Debug: EFS Output"
+  ansible.builtin.debug:
+    var: efs_output
+  when: debug_output

@@ -1,0 +1,21 @@
+---
+# tasks file for roles/subnets
+
+- name: "Create subnet in the availability zone"
+  amazon.aws.ec2_vpc_subnet:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    cidr: "{{ vpc_output.vpc.cidr_block | ansible.utils.ipsubnet(vpc.subnet_size, az_loop_index + (subnet_index * az_zones_from_main.availability_zones | length)) }}"
+    az: "{{ az_item.zone_name }}"
+    tags:
+      Name: "{{ subnet_name }}-{{ playbook_dict.subnet }}-{{ az_item.zone_id }}"
+      projectName: "{{ app.name }}"
+      environment: "{{ app.env }}"
+      deployedBy: "{{ playbook_dict.deployedBy }}"
+      description: "{{ playbook_dict.ansible_warning }}"
+      role: "{{ subnet_role }}"
+  loop: "{{ az_zones_from_main.availability_zones }}"
+  loop_control:
+    loop_var: az_item
+    index_var: az_loop_index

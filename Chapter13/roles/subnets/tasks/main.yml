@@ -1,0 +1,81 @@
+---
+# tasks file for roles/subnets
+
+- name: "Get some information on the available zones"
+  amazon.aws.aws_az_info:
+    region: "{{ region }}"
+  register: zones_output
+
+- name: "Debug - Zones result"
+  ansible.builtin.debug:
+    var: "zones_output"
+  when: debug_output
+
+- name: "Create all subnets"
+  ansible.builtin.include_tasks: create_subnet.yml
+  loop: "{{ vpc.subnets }}"
+  loop_control:
+    loop_var: subnet_item
+    index_var: subnet_index
+  vars:
+    subnet_name: "{{ subnet_item.name }}"
+    subnet_role: "{{ subnet_item.role }}"
+    az_zones_from_main: "{{ zones_output }}"
+  register: subnet_output
+
+- name: "Debug - All Subnets"
+  ansible.builtin.debug:
+    var: "subnet_output"
+  when: debug_output
+
+- name: "Gather information about the compute subnets"
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ region }}"
+    filters:
+      "tag:role": "{{ subnet_role_compute }}"
+      "tag:environment": "{{ app.env }}"
+      "tag:projectName": "{{ app.name }}"
+  register: subnets_compute_output
+
+- name: "Gather information about the database subnets"
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ region }}"
+    filters:
+      "tag:role": "{{ subnet_role_database }}"
+      "tag:environment": "{{ app.env }}"
+      "tag:projectName": "{{ app.name }}"
+  register: subnets_database_output
+
+- name: "Gather information about the storage subnets"
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ region }}"
+    filters:
+      "tag:role": "{{ subnet_role_storage }}"
+      "tag:environment": "{{ app.env }}"
+      "tag:projectName": "{{ app.name }}"
+  register: subnets_storage_output
+
+- name: "Gather information about the public subnets"
+  amazon.aws.ec2_vpc_subnet_info:
+    region: "{{ region }}"
+    filters:
+      "tag:role": "{{ subnet_role_public }}"
+      "tag:environment": "{{ app.env }}"
+      "tag:projectName": "{{ app.name }}"
+  register: subnets_public_output
+
+- name: "Register just the IDs for each of the subnets"
+  ansible.builtin.set_fact:
+    subnet_compute_ids: "{{ subnets_compute_output.subnets | map(attribute='id') | list }}"
+    subnet_database_ids: "{{ subnets_database_output.subnets | map(attribute='id') | list }}"
+    subnet_storage_ids: "{{ subnets_storage_output.subnets | map(attribute='id') | list }}"
+    subnet_public_ids: "{{ subnets_public_output.subnets | map(attribute='id') | list }}"
+
+- name: "Debug - Subnet IDs"
+  ansible.builtin.debug:
+    msg:
+      - "Compute Subnet IDs: {{ subnet_compute_ids }}"
+      - "Database Subnet IDs: {{ subnet_database_ids }}"
+      - "Storage Subnet IDs: {{ subnet_storage_ids }}"
+      - "Public Subnet IDs: {{ subnet_public_ids }}"
+  when: debug_output

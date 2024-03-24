@@ -1,0 +1,6 @@
+---
+
+aws_endpoints:
+  efs: "{{ efs_output.efs.filesystem_address.split(':')[0] }}"
+  rds: "{{ rds_instance_output.endpoint.address }}"
+  elb: "{{ loadbalancer_output.dns_name }}"

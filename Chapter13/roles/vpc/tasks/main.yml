@@ -1,0 +1,23 @@
+---
+# tasks file for roles/vpc
+
+- name: "Create VPC"
+  amazon.aws.ec2_vpc_net:
+    name: "{{ vpc_name }}"
+    region: "{{ region }}"
+    cidr_block: "{{ vpc.cidr_block }}"
+    dns_hostnames: "{{ vpc.dns_hostnames }}"
+    dns_support: "{{ vpc.dns_support }}"
+    state: "{{ state }}"
+    tags:
+      Name: "{{ vpc_name }}"
+      projectName: "{{ app.name }}"
+      environment: "{{ app.env }}"
+      deployedBy: "{{ playbook_dict.deployedBy }}"
+      description: "{{ playbook_dict.ansible_warning }}"
+  register: vpc_output
+
+- name: "Debug - VPC result"
+  ansible.builtin.debug:
+    var: "vpc_output"
+  when: debug_output

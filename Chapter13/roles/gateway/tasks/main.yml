@@ -1,0 +1,44 @@
+---
+# tasks file for roles/gateway
+
+- name: "Create an Internet Gateway"
+  amazon.aws.ec2_vpc_igw:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    tags:
+      "Name": "{{ internet_gateway_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "igw"
+  register: internet_gateway_output
+
+- name: "Debug: Internet Gateway Output"
+  ansible.builtin.debug:
+    var: "internet_gateway_output"
+  when: debug_output
+
+- name: "Create a route table so the internet gateway can be used by the public subnets"
+  amazon.aws.ec2_vpc_route_table:
+    region: "{{ region }}"
+    state: "{{ state }}"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    subnets: "{{ subnet_compute_ids + subnet_public_ids }}"
+    routes:
+      - dest: "0.0.0.0/0"
+        gateway_id: "{{ internet_gateway_output.gateway_id }}"
+    resource_tags:
+      "Name": "{{ internet_gateway_route_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "route"
+  register: internet_gateway_route_output
+
+- name: "Debug: Internet Gateway Route Output"
+  ansible.builtin.debug:
+    var: "internet_gateway_route_output"
+  when: debug_output

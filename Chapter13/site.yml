@@ -1,0 +1,51 @@
+---
+
+- name: "Deploy and configure the AWS Environment"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    state: "present"
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - vpc
+    - subnets
+    - gateway
+    - securitygroups
+    - elb
+    - efs
+    - rds
+    - ec2tmp
+    - endpoints
+
+- name: "Install and configure Wordpress"
+  hosts: vmgroup
+  gather_facts: true
+  become: true
+  become_method: "ansible.builtin.sudo"
+
+  vars_files:
+    - group_vars/common.yml
+    - group_vars/generated_aws_endpoints.yml
+
+  roles:
+    - stack_install
+    - stack_config
+    - wordpress
+
+- name: "Create AMI and update the Auto Scaling Group"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    state: "present"
+
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - ec2ami
+    - autoscaling

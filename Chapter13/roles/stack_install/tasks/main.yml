@@ -1,0 +1,33 @@
+---
+# tasks file for roles/stack-install
+
+# Run apt-get update and upgrade
+- name: "Update apt-cache and upgrade packages"
+  ansible.builtin.apt:
+    name: "*"
+    state: "latest"
+    update_cache: true
+  tags:
+    - "skip_ansible_lint"
+
+# Add repository keys
+- name: "Add the apt keys from a URL"
+  ansible.builtin.apt_key:
+    url: "{{ item }}"
+    state: "present"
+  with_items: "{{ repo_keys_url }}"
+
+# Add repository packages
+- name: "Install the repo packages"
+  ansible.builtin.apt_repository:
+    repo: "{{ item }}"
+    state: "present"
+    update_cache: true
+  with_items: "{{ repo_packages }}"
+
+# Install system, extra and stack packages
+- name: "Update cache and install the stack packages"
+  ansible.builtin.apt:
+    state: "present"
+    update_cache: true
+    pkg: "{{ system_packages + extra_packages + stack_packages }}"

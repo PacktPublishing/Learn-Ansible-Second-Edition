@@ -1,0 +1,64 @@
+---
+# tasks file for roles/elb
+
+- name: "Provision the target group"
+  community.aws.elb_target_group:
+    name: "{{ elb_target_group_name }}"
+    region: "{{ region }}"
+    state: "{{ state }}"
+    protocol: "http"
+    port: "80"
+    deregistration_delay_timeout: "15"
+    vpc_id: "{{ vpc_output.vpc.id }}"
+    modify_targets: "false"
+    tags:
+      "Name": "{{ elb_target_group_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "target-group"
+  register: elb_target_group_output
+
+- name: "Debug: ELB Target Group Output"
+  ansible.builtin.debug:
+    var: "elb_target_group_output"
+  when: debug_output
+
+- name: Extract ELB Group ID
+  ansible.builtin.set_fact:
+    elb_group_id: "{{ item.group_id }}"
+  loop: "{{ security_groups_with_rules_output.results }}"
+  when: item.group_name is search(elb_seach_string)
+
+- name: "Debug: ELB Target Group Output"
+  ansible.builtin.debug:
+    var: elb_group_id
+  when: debug_output
+
+- name: "Provision an application elastic load balancer"
+  amazon.aws.elb_application_lb:
+    region: "{{ region }}"
+    name: "{{ elb_name }}"
+    state: "{{ state }}"
+    security_groups: "{{ elb_group_id }}"
+    subnets: "{{ subnet_public_ids }}"
+    listeners:
+      - Protocol: "HTTP"
+        Port: "80"
+        DefaultActions:
+          - Type: "forward"
+            TargetGroupArn: "{{ elb_target_group_output.target_group_arn }}"
+    tags:
+      "Name": "{{ elb_name }}"
+      "projectName": "{{ app.name }}"
+      "environment": "{{ app.env }}"
+      "deployedBy": "{{ playbook_dict.deployedBy }}"
+      "description": "{{ playbook_dict.ansible_warning }}"
+      "role": "load-balancer"
+  register: loadbalancer_output
+
+- name: "Debug: ELB Output"
+  ansible.builtin.debug:
+    var: "loadbalancer_output"
+  when: debug_output
