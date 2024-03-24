@@ -12,6 +12,10 @@
   ansible.builtin.get_url:
     url: "{{ wp_cli.download }}"
     dest: "{{ wp_cli.path }}"
+
+- name: "Update permissions of wp-cli to allow anyone to execute it"
+  ansible.builtin.file:
+    path: "{{ wp_cli.path }}"
     mode: "0755"
 
 # Create the database
