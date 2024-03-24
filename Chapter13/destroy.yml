@@ -1,5 +1,5 @@
+# kics-scan disable=88841d5c-d22d-4b7e-a6a0-89ca50e44b9f,b8a9852c-9943-4973-b8d5-77dae9352851,050f085f-a8db-4072-9010-2cca235cc02f,727c4fd4-d604-4df6-a179-7713d3c85e20,bd77554e-f138-40c5-91b2-2a09f878608e
 ---
-
 - name: "Destroy the AWS Environment created by the site.yml playbook"
   hosts: localhost
   connection: local

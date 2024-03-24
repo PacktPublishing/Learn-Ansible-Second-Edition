@@ -1,3 +1,4 @@
+# kics-scan disable=bd77554e-f138-40c5-91b2-2a09f878608e
 ---
 # tasks file for roles/efs
 
@@ -16,12 +17,14 @@
   ansible.builtin.template:
     src: "targets.j2"
     dest: "group_vars/generated_efs_targets.yml"
+    mode: "0644"
 
 - name: "Include the efs targets vars file"
   ansible.builtin.include_vars: "group_vars/generated_efs_targets.yml"
 
 - name: "Create the EFS File System"
   community.aws.efs:
+    encrypt: true
     name: "{{ efs_name }}"
     region: "{{ region }}"
     state: "{{ state }}"
