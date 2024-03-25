@@ -1,0 +1,35 @@
+---
+# defaults file for roles/stack-install
+
+repo_keys_url:
+  - "http://nginx.org/keys/nginx_signing.key"
+
+repo_packages:
+  - "deb http://nginx.org/packages/mainline/ubuntu/ {{ ansible_distribution_release }} nginx"
+  - "deb-src http://nginx.org/packages/mainline/ubuntu/ {{ ansible_distribution_release }} nginx"
+
+system_packages:
+  - "software-properties-common"
+  - "python3-pymysql"
+  - "acl"
+
+extra_packages:
+  - "vim"
+  - "git"
+  - "unzip"
+
+stack_packages:
+  - "nginx"
+  - "mariadb-server"
+  - "mariadb-client"
+  - "php-cli"
+  - "php-curl"
+  - "php-fpm"
+  - "php-gd"
+  - "php-intl"
+  - "php-mbstring"
+  - "php-mysql"
+  - "php-soap"
+  - "php-xml"
+  - "php-xmlrpc"
+  - "php-zip"

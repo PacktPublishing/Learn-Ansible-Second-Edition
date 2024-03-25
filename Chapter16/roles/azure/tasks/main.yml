@@ -1,0 +1,198 @@
+---
+# tasks file for roles/azure
+
+- name: "Create the resource group"
+  azure.azcollection.azure_rm_resourcegroup:
+    name: "{{ resource_group_name }}"
+    location: "{{ location }}"
+    tags: "{{ common_tags }}"
+  register: "resource_group_output"
+
+- name: "Debug - Resource Group result"
+  ansible.builtin.debug:
+    var: "resource_group_output"
+  when: debug_output
+
+- name: "Create the virtual network"
+  azure.azcollection.azure_rm_virtualnetwork:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ virtual_network_name }}"
+    address_prefixes: "{{ vnet_config.cidr_block }}"
+    tags: "{{ common_tags }}"
+  register: "virtual_network_output"
+
+- name: "Debug - Virtual Network result"
+  ansible.builtin.debug:
+    var: "virtual_network_output"
+  when: debug_output
+
+- name: "Add the subnets to the virtual network"
+  azure.azcollection.azure_rm_subnet:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ item.name }}"
+    address_prefix: "{{ item.subnet }}"
+    virtual_network: "{{ virtual_network_output.state.name }}"
+    service_endpoints:
+      - service: "{{ item.service_endpoints }}"
+  with_items: "{{ vnet_config.subnets }}"
+  register: "subnet_output"
+
+- name: "Debug - Subnets result"
+  ansible.builtin.debug:
+    var: "subnet_output"
+  when: debug_output
+
+- name: "Find out your current public IP address using https://ipify.org/"
+  community.general.ipify_facts:
+  register: public_ip_output
+
+- name: "Debug - Public IP result"
+  ansible.builtin.debug:
+    var: "public_ip_output"
+  when: debug_output
+
+- name: "Register your public ip as a fact"
+  ansible.builtin.set_fact:
+    your_public_ip: "{{ public_ip_output.ansible_facts.ipify_public_ip }}"
+
+- name: "Create the network security group"
+  azure.azcollection.azure_rm_securitygroup:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ nsg_name }}"
+    rules: "{{ nsg_rules }}"
+    tags: "{{ common_tags }}"
+  register: "nsg_output"
+
+- name: "Debug - Network Security Group result"
+  ansible.builtin.debug:
+    var: "nsg_output"
+  when: debug_output
+
+- name: "Create the public IP address needed for the load balancer"
+  azure.azcollection.azure_rm_publicipaddress:
+    resource_group: "{{ resource_group_output.state.name }}"
+    allocation_method: "Static"
+    name: "{{ load_balancer_public_ip_name }}"
+    sku: "standard"
+    domain_name: "{{ app.public_dns_name }}"
+    tags: "{{ common_tags }}"
+  register: "public_ip_output"
+
+- name: "Debug - Public IP result"
+  ansible.builtin.debug:
+    var: "public_ip_output"
+  when: debug_output
+
+- name: "Create load balancer using the public IP we created"
+  azure.azcollection.azure_rm_loadbalancer:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ load_balancer_name }}"
+    sku: "Standard"
+    frontend_ip_configurations:
+      - name: "{{ load_balancer_name }}-frontend-ip-config"
+        public_ip_address: "{{ public_ip_output.state.name }}"
+    backend_address_pools:
+      - name: "{{ load_balancer_name }}-backend-address-pool"
+    probes:
+      - name: "{{ load_balancer_name }}-http-probe"
+        port: "{{ load_balancer.http_port_backend }}"
+        fail_count: "3"
+        protocol: "Tcp"
+    load_balancing_rules:
+      - name: "{{ load_balancer_name }}-rule-http"
+        frontend_ip_configuration: "{{ load_balancer_name }}-frontend-ip-config"
+        backend_address_pool: "{{ load_balancer_name }}-backend-address-pool"
+        frontend_port: "{{ load_balancer.http_port }}"
+        backend_port: "{{ load_balancer.http_port_backend }}"
+        probe: "{{ load_balancer_name }}-http-probe"
+    inbound_nat_rules:
+      - name: "{{ load_balancer_name }}-nat-ssh"
+        frontend_ip_configuration: "{{ load_balancer_name }}-frontend-ip-config"
+        backend_port: "{{ load_balancer.ssh_port }}"
+        frontend_port: "{{ load_balancer.ssh_port }}"
+        protocol: "Tcp"
+    tags: "{{ common_tags }}"
+  register: "load_balancer_output"
+
+- name: "Debug - Load Balancer result"
+  ansible.builtin.debug:
+    var: "load_balancer_output"
+  when: debug_output
+
+- name: "Create the network interface for the wordpress vm"
+  azure.azcollection.azure_rm_resource:
+    api_version: "2023-05-01"
+    resource_group: "{{ resource_group_output.state.name }}"
+    idempotency: true
+    provider: "network"
+    resource_type: "networkinterfaces"
+    resource_name: "{{ dict.network_interface }}-{{ vm_name }}"
+    body:
+      location: "{{ location }}"
+      properties:
+        enableAcceleratedNetworking: false
+        primary: true
+        networksecuritygroup:
+          id: "{{ nsg_output.state.id }}"
+        ipConfigurations:
+          - name: "{{ vm_name }}-ipcfg"
+            properties:
+              subnet:
+                id: "{{ subnet_output.results[0].state.id }}"
+              loadBalancerBackendAddressPools:
+                - id: "{{ load_balancer_output.state.backend_address_pools[0].id }}"
+              loadBalancerInboundNatRules:
+                - id: "{{ load_balancer_output.state.inbound_nat_rules[0].id }}"
+      tags: "{{ common_tags }}"
+  register: "network_interface_output"
+
+- name: "Debug - Network Interface result"
+  ansible.builtin.debug:
+    var: "network_interface_output"
+  when: debug_output
+
+- name: "Check user has a key, if not create one for {{ ansible_user_id }}"
+  ansible.builtin.user:
+    name: "{{ ansible_user_id }}"
+    generate_ssh_key: true
+    ssh_key_file: "~/.ssh/id_rsa"
+  when: genterate_key
+
+- name: "Create the admin virtual machine"
+  azure.azcollection.azure_rm_virtualmachine:
+    resource_group: "{{ resource_group_output.state.name }}"
+    name: "{{ vm_name }}"
+    admin_username: "{{ vm_config.admin_username }}"
+    ssh_public_keys:
+      - path: "{{ vm_config.key.path }}"
+        key_data: "{{ vm_config.key.data }}"
+    ssh_password_enabled: "{{ vm_config.ssh_password_enabled }}"
+    vm_size: "{{ vm_config.vm_size }}"
+    managed_disk_type: "{{ vm_config.disk.managed_disk_type }}"
+    network_interfaces: "{{ network_interface_output.response.name }}"
+    image:
+      offer: "{{ vm_config.image.offer }}"
+      publisher: "{{ vm_config.image.publisher }}"
+      sku: "{{ vm_config.image.sku }}"
+      version: "{{ vm_config.image.version }}"
+    tags: "{{ common_tags }}"
+  register: "vm_output"
+
+- name: "Debug - Virtual Machine result"
+  ansible.builtin.debug:
+    var: "vm_output"
+  when: debug_output
+
+- name: Add the Virtual Machine to the host group
+  ansible.builtin.add_host:
+    groups: "{{ hosts_group }}"
+    hostname: "{{ public_ip_output.state.ip_address }}-{{ load_balancer.ssh_port }}"
+    ansible_host: "{{ public_ip_output.state.ip_address }}"
+    ansible_port: "{{ load_balancer.ssh_port }}"
+
+- name: "Wait for the virtual machine to be ready"
+  ansible.builtin.wait_for:
+    host: "{{ public_ip_output.state.ip_address }}"
+    port: "{{ load_balancer.ssh_port }}"
+    delay: 10
+    timeout: 300

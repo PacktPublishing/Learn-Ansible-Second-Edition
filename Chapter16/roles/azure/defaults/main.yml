@@ -1,0 +1,94 @@
+---
+# defaults file for roles/azure
+
+# Dictionary
+##################################################
+dict:
+  ansible_warning: "Resource managed by Ansible"
+  load_balancer: "lb"
+  network_interface: "nic"
+  nsg: "nsg"
+  private_endpoint: "pe"
+  public_ip: "pip"
+  resource_group: "rg"
+  subnet: "snet"
+  virtual_machine: "vm"
+  virtualnetwork: "vnet"
+
+# Resource names
+##################################################
+
+load_balancer_name: "{{ dict.load_balancer }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+load_balancer_public_ip_name: "{{ dict.public_ip }}-{{ load_balancer_name }}"
+nsg_name: "{{ dict.nsg }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+virtual_network_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+vm_name: "{{ dict.virtual_machine }}-admin-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+vnet_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+
+# Virtual network
+##################################################
+
+vnet_config:
+  cidr_block: "10.0.0.0/24"
+  subnets:
+    - {
+      name: "{{ dict.subnet }}-vms-{{ app.name }}-{{ app.env }}-{{ app.location_short }}",
+      subnet: "10.0.0.0/27",
+      private: true,
+      service_endpoints: "Microsoft.Storage",
+    }
+
+trusted_ips:
+  - ""
+
+dynamic_ips:
+  - "{{ your_public_ip }}" # The IP address of whomever is running Ansible
+
+nsg_rules:
+  - name: "allowHTTP"
+    description: "{{ dict.ansible_warning }}"
+    protocol: "Tcp"
+    destination_port_range: "80"
+    source_address_prefix: "*"
+    access: "Allow"
+    priority: "100"
+    direction: "Inbound"
+  - name: "allowSSH"
+    description: "{{ dict.ansible_warning }}"
+    protocol: "Tcp"
+    destination_port_range: "{{ load_balancer.ssh_port }}"
+    source_address_prefix: "{{ trusted_ips | select() + dynamic_ips | unique }}"
+    access: "Allow"
+    priority: "150"
+    direction: "Inbound"
+
+load_balancer:
+  ssh_port: "22"
+  ssh_port_backend: "22"
+  http_port: "80"
+  http_port_backend: "80"
+
+# Virtual Machine
+##################################################
+
+vm_config:
+  admin_username: "adminuser"
+  ssh_password_enabled: false
+  vm_size: "Standard_B1ms"
+  image:
+    publisher: "Canonical"
+    offer: "0001-com-ubuntu-server-jammy"
+    sku: "22_04-LTS"
+    version: "latest"
+  disk:
+    managed_disk_type: "Premium_LRS"
+    caching: "ReadWrite"
+  key:
+    path: "/home/adminuser/.ssh/authorized_keys"
+    data: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+
+# Some other settings
+##################################################
+location: "{{ app.location }}"
+hosts_group: "vmgroup"

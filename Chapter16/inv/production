@@ -1,0 +1,15 @@
+[local]
+localhost ansible_connection=local
+
+# Register all of the host groups we will be creating in the playbooks
+[vmgroup]
+
+# Put all the groups into into a single group so we can easily apply one config to it for overriding things like the ssh user and key location
+[azure_vms:children]
+vmgroup
+
+# Finally, configure some bits to allow us access to the instances before we deploy our credentials using Ansible
+[azure_vms:vars]
+ansible_ssh_user=adminuser
+ansible_ssh_private_key_file=~/.ssh/id_rsa
+host_key_checking=False

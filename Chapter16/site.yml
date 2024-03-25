@@ -1,0 +1,25 @@
+---
+
+- name: "Deploy and configure the Azure Environment"
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - "azure"
+
+- name: "Install and configure Wordpress"
+  hosts: vmgroup
+  gather_facts: true
+  become: true
+  become_method: "ansible.builtin.sudo"
+  vars_files:
+    - group_vars/common.yml
+
+  roles:
+    - "secrets"
+    - "stack_install"
+    - "stack_config"
+    - "wordpress"
