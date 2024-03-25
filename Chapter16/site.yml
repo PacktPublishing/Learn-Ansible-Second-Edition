@@ -19,7 +19,6 @@
     - group_vars/common.yml
 
   roles:
-    - "secrets"
     - "stack_install"
     - "stack_config"
     - "wordpress"
