@@ -4,3 +4,5 @@ collections:
     source: "https://galaxy.ansible.com"
   - name: "azure.azcollection"
     source: "https://galaxy.ansible.com"
+  - name: "community.mysql"
+    source: "https://galaxy.ansible.com"
