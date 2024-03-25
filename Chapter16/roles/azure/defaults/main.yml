@@ -86,7 +86,7 @@ vm_config:
     caching: "ReadWrite"
   key:
     path: "/home/adminuser/.ssh/authorized_keys"
-    data: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    data: "{{ ssh_key_public }}"
 
 # Some other settings
 ##################################################
