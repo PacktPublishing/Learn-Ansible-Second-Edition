@@ -1,0 +1,27 @@
+---
+
+- name: Delete all of the Azure resources
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  vars:
+    dict:
+      resource_group: "rg"
+    resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{app.env}}-{{ app.location_short }}"
+    location: "{{ app.location_short }}"
+    
+  vars_files:
+    - group_vars/common.yml
+
+  tasks:
+    - name: "Terminate all resources in the resource group"
+      azure.azcollection.azure_rm_resourcegroup:
+        name: "{{ resource_group_name }}"
+        location: "{{ location }}"
+        state: absent
+        force_delete_nonempty: true
+
+    - name: "Delete the secrets.yml file"
+      ansible.builtin.file:
+        path: "group_vars/secrets.yml"
+        state: "absent"

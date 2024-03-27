@@ -1,0 +1,19 @@
+- name: "Notify the team on Slack about resource changes"
+  community.general.slack:
+    token: "{{ slack.token }}"
+    parse: "none"
+    attachments:
+      - fallback: "Notification about Azure resource changes"
+        color: "{% if resource_changed %}warning{% else %}good{% endif %}"
+        title: "Ansible: {{ resource_type }}"
+        text: "{{ resource_name }} has been {% if resource_changed %}created/updated{% else %}checked (no changes){% endif %}."
+        fields:
+          - title: "Location"
+            value: "{{ resource_location }}"
+            short: true
+          - title: "Azure Portal"
+            value: "<{{ azure_portal_link }}|View in Azure Portal>"
+            short: true
+          - title: "Tags"
+            value: "{{ resource_tags }}"
+            short: false

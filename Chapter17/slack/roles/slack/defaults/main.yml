@@ -1,0 +1,34 @@
+---
+# defaults file for roles/slack
+
+# Dictionary
+##################################################
+dict:
+  ansible_warning: "Resource managed by Ansible"
+  resource_group: "rg"
+  subnet: "snet"
+  virtualnetwork: "vnet"
+
+# Resource names
+##################################################
+
+resource_group_name: "{{ dict.resource_group }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+virtual_network_name: "{{ dict.virtualnetwork }}-{{ app.name }}-{{ app.env }}-{{ app.location_short }}"
+
+# Virtual network
+##################################################
+
+vnet_config:
+  cidr_block: "10.0.0.0/24"
+  subnets:
+    - {
+      name: "{{ dict.subnet }}-vms-{{ app.name }}-{{ app.env }}-{{ app.location_short }}",
+      subnet: "10.0.0.0/27",
+      private: true,
+      service_endpoints: "Microsoft.Storage",
+    }
+
+# Some other settings
+##################################################
+location: "{{ app.location }}"
+hosts_group: "vmgroup"
