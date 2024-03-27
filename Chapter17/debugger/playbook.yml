@@ -1,0 +1,15 @@
+---
+
+- name: "A simple playbook with a mistake"
+  hosts: "localhost"
+  debugger: "on_failed"
+
+  vars:
+    message: "The task has completed and all is well"
+    voice: "Daniel"
+
+  tasks:
+    - name: "Say a message on your Ansible host"
+      community.general.say:
+        msg: "{{ massage }}"
+        voice: "{{ voice }}"
