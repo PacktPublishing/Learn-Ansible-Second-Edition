@@ -2,6 +2,7 @@
 
 - name: "A simple playbook with a mistake"
   hosts: "localhost"
+  gather_facts: true
   debugger: "on_failed"
 
   vars:
