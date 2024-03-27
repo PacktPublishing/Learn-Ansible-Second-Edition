@@ -75,6 +75,6 @@
     resource_type: "Subnet"
     resource_name: "{{ item.invocation.module_args.name }}"
     resource_location: "{{ virtual_network_output.state.location }}"
-    azure_portal_link: "https://portal.azure.com/"
+    azure_portal_link: "https://portal.azure.com/#resource{{ virtual_network_output.state.id }}"
     resource_tags: "N/A"
   loop: "{{ subnet_output.results }}"
