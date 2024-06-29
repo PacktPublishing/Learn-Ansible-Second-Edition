@@ -115,7 +115,7 @@ stages:
                   echo "##[endgroup]"
                   echo "##[group]Install the Azure Ansible Collection"
                       ansible-galaxy collection install --force azure.azcollection
-                      pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements-azure.txt
+                      pip3 install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
                   echo "##[endgroup]"
                   echo "##[group]Run the Ansible Playbook"
                       ansible-playbook -i inv site.yml 2>&1 | tee $(System.DefaultWorkingDirectory)/ansible_output.log
